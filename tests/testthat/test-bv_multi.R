@@ -8,10 +8,10 @@ test_that("restarts works", {
   # a <- .Random.seed
   bvout <- bv_multi(ref_mat = varespec, comp_mat = varespec,
                    ref_dist = 'bray', comp_dist = 'bray',
-                   rand_start = TRUE, nrand = 5, num_restarts = 5)
+                   rand_start = TRUE, nrand = 5, num_restarts = 10)
   expect_s3_class(bvout, 'data.frame')
-  expect_equal(nrow(bvout), 76) #This will not be the same as purrr, since furrr seeds itself
-  expect_equal(names(bvout), c('random_start', 'step', 'FB', 'corr', 'species'))
+  expect_equal(nrow(bvout), 74) #This will not be the same as purrr, since furrr seeds itself
+  expect_equal(names(bvout), c('random_start', 'step', 'FB', 'num_vars', 'corr', 'species'))
 
 
 })
@@ -24,8 +24,8 @@ test_that("parallel works", {
                     ref_dist = 'bray', comp_dist = 'bray',
                     rand_start = TRUE, nrand = 5, num_restarts = 50)
 
-  expect_type(bvout, 'tibble')
-  expect_equal(names(bvout), c('random_start', 'step', 'FB', 'corr', 'species'))
+  expect_s3_class(bvout, 'data.frame')
+  expect_equal(names(bvout), c('random_start', 'step', 'FB', 'num_vars', 'corr', 'species'))
 
   # reset future plan
   future::plan(future::sequential)
@@ -45,6 +45,6 @@ test_that("purrr works", {
 
     expect_equal(nrow(bvout), 80)
 
-    expect_equal(names(bvout), c('random_start', 'step', 'FB', 'corr', 'species'))
+    expect_equal(names(bvout), c('random_start', 'step', 'FB', 'num_vars', 'corr', 'species'))
 
 })

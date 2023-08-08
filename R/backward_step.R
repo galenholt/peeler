@@ -42,7 +42,7 @@ backward_step <- function(remove_sp, comp_mat, initial_sp, ref_distmat, comp_dis
 #' @examples
 single_backward <- function(cut_sp, comp_mat, initial_sp, ref_distmat, comp_dist, corr_method) {
 
-  check_mat <- comp_mat[,initial_sp[!(initial_sp %in% cut_sp)]]
+  check_mat <- comp_mat[,initial_sp[!(initial_sp %in% cut_sp)], drop = FALSE]
   correlation <- distcorr(check_mat, ref_distmat, comp_dist, corr_method)
   return(correlation)
 }

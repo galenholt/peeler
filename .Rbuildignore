@@ -2,3 +2,5 @@
 ^renv\.lock$
 ^peeler\.Rproj$
 ^\.Rproj\.user$
+^LICENSE\.md$
+notebooks/

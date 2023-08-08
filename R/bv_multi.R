@@ -43,7 +43,8 @@ bv_multi <- function(ref_mat,
                      rho_threshold = 0.95,
                      min_delta_rho = 0.001,
                      corr_method = 'kendall',
-                     returndf = TRUE) {
+                     returndf = TRUE,
+                     selection_ref = 'name') {
 
   # Sanity check the num_restarts
   if (!rand_start & num_restarts > 1) {
@@ -70,7 +71,8 @@ bv_multi <- function(ref_mat,
                                                             force_exclude = force_exclude,
                                                             rho_threshold = rho_threshold,
                                                             min_delta_rho = min_delta_rho,
-                                                            corr_method = corr_method),
+                                                            corr_method = corr_method,
+                                                            selection_ref = selection_ref),
                                 .options = furrr::furrr_options(seed = TRUE))
   } else {
     bvlist <- purrr::map(1:num_restarts, \(i) bvstep(ref_mat = ref_mat,
@@ -83,7 +85,8 @@ bv_multi <- function(ref_mat,
                                                      force_exclude = force_exclude,
                                                      rho_threshold = rho_threshold,
                                                      min_delta_rho = min_delta_rho,
-                                                     corr_method = corr_method))
+                                                     corr_method = corr_method,
+                                                     selection_ref = selection_ref))
   }
 
   names(bvlist) <- as.character(1:num_restarts)
@@ -91,13 +94,14 @@ bv_multi <- function(ref_mat,
   # Rank and sort them by maximum correlation
   maxcor <- sapply(bvlist, \(x) max(x$corr))
 
-  best_order <- rev(rank(maxcor, ties.method = ties.method))
+  # negative here to have larger numbers first
+  best_order <- rank(-maxcor, ties.method = ties.method)
 
   # Truncate the list at the num_best_results
 
-  best_order_trunc <- best_order[best_order <= num_best_results]
+  best_order_trunc <- sort(best_order[best_order <= num_best_results])
 
-  bvlist <- bvlist[best_order_trunc]
+  bvlist <- bvlist[names(best_order_trunc)]
 
   if (returndf) {
     return(dplyr::bind_rows(bvlist, .id = "random_start"))

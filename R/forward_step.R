@@ -37,7 +37,7 @@ forward_step <- function(comp_mat, initial_sp, ref_distmat, comp_dist, corr_meth
 #'
 #' @examples
 single_forward <- function(add_sp, comp_mat, initial_sp, ref_distmat, comp_dist, corr_method) {
-  check_mat <- comp_mat[,c(initial_sp, add_sp)]
+  check_mat <- comp_mat[,c(initial_sp, add_sp), drop = FALSE]
   correlation <- distcorr(check_mat, ref_distmat, comp_dist, corr_method)
   return(correlation)
 }
