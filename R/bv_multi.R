@@ -4,8 +4,8 @@
 #' Runs [bvstep()] a number of times with random starts, sorts the outcomes by
 #' correlation, and returns the best `num_best_results` as either a list or
 #' dataframe. This uses {furrr} if it is installed, and so allows the user to
-#' run each set of randon starts in parallel by setting a `[future::plan()]`, e.g.
-#' `plan(multisession)` before running this code.
+#' run each set of randon starts in parallel by setting a `[future::plan()]`,
+#' e.g. `plan(multisession)` before running this code.
 #'
 #'
 #' @inheritParams bvstep
@@ -22,12 +22,19 @@
 #'   choice is `min`, ties are given the minimum value. This will return *at
 #'   least* `num_best_results` runs, but may return more if ties cross that
 #'   boundary.
-#' @param returndf logical, default `TRUE`-
+#' @param return_type character, defines how much to return
+#'  * `'final'`: default, returns the final outcome of the best `num_best_results` random starts
+#'  * `'steps'`: returns the full set of forward/backward steps for the best `num_best_results` random starts
+#'  * `'unique'`: returns the best `num_best_results` best selections out of all steps of all random starts. The first entry should be the same as in `'final'`, but after that they may not be, if the penultimate selection in some sets are better than the final selection in others
+#' @param returndf logical, default `TRUE`, only relevant if `return_type =
+#'   'steps`
 #'  * `TRUE`: return a dataframe as in [bvstep()] with an additional column indicating which iterations are returned.
 #'  * `FALSE`: return a list, with each element a dataframe as returned by [bvstep()]
-#'
-#' @return dataframe or list, as determined by `returndf`, of the best
-#'   `num_best_results`, sorted by highest correlations.
+#' @return dataframe (typically) or list (if `return_type == 'steps'` and
+#'   `returndf = FALSE`), of the best `num_best_results`, sorted by number of
+#'   species if correlation is over `rho_threshold`, and then highest
+#'   correlations. The `num_tied_with` column indicates how many results had the
+#'   same num_vars and correlation
 #' @export
 #'
 #' @examples
@@ -45,6 +52,7 @@ bv_multi <- function(ref_mat,
                      rho_threshold = 0.95,
                      min_delta_rho = 0.001,
                      corr_method = 'kendall',
+                     return_type = 'final',
                      returndf = TRUE,
                      selection_ref = 'name') {
 
@@ -91,25 +99,100 @@ bv_multi <- function(ref_mat,
                                                      selection_ref = selection_ref))
   }
 
+  # Fix to choose smallest set given above threshold
+  # AND- choose the LAST, nto the MAX, since it could have stepped back
+  # AND IN BVSTEP ITSELF
+  # And should I return the best *unique*, which might return earlier examples?
   names(bvlist) <- as.character(1:num_restarts)
 
-  # Rank and sort them by maximum correlation
-  maxcor <- sapply(bvlist, \(x) max(x$corr))
-
-  # negative here to have larger numbers first
-  best_order <- rank(-maxcor, ties.method = ties.method)
-
-  # Truncate the list at the num_best_results
-
-  best_order_trunc <- sort(best_order[best_order <= num_best_results])
-
-  bvlist <- bvlist[names(best_order_trunc)]
-
-  if (returndf) {
-    return(dplyr::bind_rows(bvlist, .id = "random_start"))
-  } else {
-    return(bvlist)
+  # Get the final result from each iteration (usually)
+  # These come in sorted
+  if (return_type %in% c('final', 'steps')) {
+    to_rank <- extract_final(bvlist)
   }
+
+  # This version looks for the best x results across all steps, even if they're
+  # not the final outcome. The top rank here should match the above version
+  # (best outcome of best run), but the later ones may not
+
+  # Limiting this to just above rho_threshold, or if none are, the single best.
+  # This could be an issue for late peels, but otherwise it's a pain to do
+  # conditional sorts
+  if (return_type %in% c('unique')) {
+    to_rank <- dplyr::bind_rows(bvlist, .id = "random_start")
+
+    if (max(to_rank$corr, na.rm = TRUE) >= rho_threshold) {
+      to_rank <- to_rank |>
+        dplyr::filter(corr > rho_threshold)
+    } else {
+      to_rank <- to_rank|>
+        dplyr::filter(corr == max(corr, na.rm = TRUE))
+    }
+  }
+
+
+
+  # to handle ties, get the rank groups. This is a bit goofy because we want to
+  # rank by number species and then correlation above the threshold, but
+  # correlation and then species below it
+  to_rank_above <- to_rank |>
+    dplyr::mutate(above_thresh = corr >= rho_threshold) |>
+    dplyr::filter(above_thresh)
+
+  to_rank_below <- to_rank |>
+    dplyr::mutate(above_thresh = corr >= rho_threshold) |>
+    dplyr::filter(!above_thresh)
+
+  ranked_best <- to_rank_above |>
+    dplyr::group_by(num_vars, dc = dplyr::desc(corr)) |>
+    dplyr::mutate(rankgroup = dplyr::cur_group_id(),
+                  num_tied_with = dplyr::n()) |>
+    dplyr::ungroup()  |>
+    dplyr::mutate(tiebreak = stats::runif(n = length(species))) |>
+    dplyr::arrange(num_vars, desc(corr), tiebreak) |>
+    dplyr::select(-tiebreak, -above_thresh)
+
+  # Start counting ranks at max group of those above the threshold, but if there aren't any, start at 1
+  if (nrow(ranked_best) > 0) {
+    rankstart <- max(ranked_best$rankgroup)
+  } else {
+    rankstart <- 1
+  }
+
+  # Rank those below the threshold by correlation and then number of species.
+  ranked_below <- to_rank_below |>
+    dplyr::group_by(dc = dplyr::desc(corr), num_vars) |>
+    dplyr::mutate(rankgroup = rankstart + dplyr::cur_group_id(),
+                  num_tied_with = dplyr::n()) |>
+    dplyr::ungroup()  |>
+    dplyr::mutate(tiebreak = stats::runif(n = length(species))) |>
+    dplyr::arrange(desc(corr), num_vars,tiebreak) |>
+    dplyr::select(-tiebreak, -above_thresh)
+
+  ranked_best <- dplyr::bind_rows(ranked_best, ranked_below)
+
+ # use `rank` to get the row indices with ties.method
+  best_order <- which(rank(ranked_best$rankgroup,
+                           ties.method = ties.method) <= num_best_results)
+
+  best_set <- ranked_best[best_order, ] |>
+    dplyr::select(-dc, -rankgroup)
+
+  if (return_type == 'steps') {
+    bvlist <- bvlist[best_set$random_start]
+    if (returndf) {
+      return(dplyr::bind_rows(bvlist, .id = "random_start"))
+    } else {
+      return(bvlist)
+    }
+  }
+
+  if (return_type %in% c('final', 'unique')) {
+    return(best_set)
+  }
+
+
+
 
 }
 

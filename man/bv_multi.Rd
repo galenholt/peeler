@@ -20,6 +20,7 @@ bv_multi(
   rho_threshold = 0.95,
   min_delta_rho = 0.001,
   corr_method = "kendall",
+  return_type = "final",
   returndf = TRUE,
   selection_ref = "name"
 )
@@ -66,7 +67,14 @@ boundary.}
 
 \item{corr_method}{character, default \code{kendall}. This is the \code{method} argument of \code{\link[=cor]{cor()}}. Clarke and Warwick 1998 suggests kendall because we need a rank correlation and spearman doesn't handle ties.}
 
-\item{returndf}{logical, default \code{TRUE}-
+\item{return_type}{character, defines how much to return
+\itemize{
+\item \code{'final'}: default, returns the final outcome of the best \code{num_best_results} random starts
+\item \code{'steps'}: returns the full set of forward/backward steps for the best \code{num_best_results} random starts
+\item \code{'unique'}: returns the best \code{num_best_results} best selections out of all steps of all random starts. The first entry should be the same as in \code{'final'}, but after that they may not be, if the penultimate selection in some sets are better than the final selection in others
+}}
+
+\item{returndf}{logical, default \code{TRUE}, only relevant if \verb{return_type = 'steps}
 \itemize{
 \item \code{TRUE}: return a dataframe as in \code{\link[=bvstep]{bvstep()}} with an additional column indicating which iterations are returned.
 \item \code{FALSE}: return a list, with each element a dataframe as returned by \code{\link[=bvstep]{bvstep()}}
@@ -75,13 +83,16 @@ boundary.}
 \item{selection_ref}{character, \code{'name'} (default)- return the variable names in each step. \code{'index'} returns their column index in \code{comp_mat}}
 }
 \value{
-dataframe or list, as determined by \code{returndf}, of the best
-\code{num_best_results}, sorted by highest correlations.
+dataframe (typically) or list (if \code{return_type == 'steps'} and
+\code{returndf = FALSE}), of the best \code{num_best_results}, sorted by number of
+species if correlation is over \code{rho_threshold}, and then highest
+correlations. The \code{num_tied_with} column indicates how many results had the
+same num_vars and correlation
 }
 \description{
 Runs \code{\link[=bvstep]{bvstep()}} a number of times with random starts, sorts the outcomes by
 correlation, and returns the best \code{num_best_results} as either a list or
 dataframe. This uses {furrr} if it is installed, and so allows the user to
-run each set of randon starts in parallel by setting a \verb{[future::plan()]}, e.g.
-\code{plan(multisession)} before running this code.
+run each set of randon starts in parallel by setting a \verb{[future::plan()]},
+e.g. \code{plan(multisession)} before running this code.
 }

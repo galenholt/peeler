@@ -146,10 +146,6 @@ bvstep <- function(ref_mat,
         new_cor <- sample(new_cor, 1)
       }
 
-      if (is.infinite(new_cor) | new_cor == 0) {
-        a <- 1
-      }
-
 
       new_set <- c(current_set, names(new_cor))
 
@@ -228,22 +224,20 @@ bvstep <- function(ref_mat,
       # here, because we're looking for a minimal set. And so if removing a
       # species leaves rho within min_delta_rho, that's an improvement. We could
       # even make it -1*min_delta_rho for that reason, but I don't think that's
-      # what Clarke and Warwick do Don't reset anything (including the counter)
+      # what Clarke and Warwick do. Don't reset anything (including the counter)
       # in this case- it means we end up with silent loop iterations, but I
       # think the output would get confusing (and PRIMER doesn't give the failed
       # backsteps)
-      if (length(back_deltarho) == 0) {
-        a <-1
-      }
+
       if (back_deltarho <= 0) {
         nextstep <- 'forward'
         # If we're on the final_back and it doesn't help, set it to false so the loop breaks
-        if (final_back) {
+        if (final_back & (new_cor < rho_threshold)) {
           final_back <- FALSE
         }
       }
 
-      if (back_deltarho > 0) {
+      if (back_deltarho > 0 | (final_back & (new_cor >= rho_threshold))) {
         nextstep <- 'back'
         current_cor <- new_cor
         current_set <- new_set

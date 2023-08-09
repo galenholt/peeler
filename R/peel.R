@@ -58,11 +58,12 @@ peel <- function(ref_mat,
                      rho_threshold = rho_threshold,
                      min_delta_rho = min_delta_rho,
                      corr_method = corr_method,
+                     return_type = 'final',
                      returndf = TRUE,
                      selection_ref = 'name')
 
   # The final result of the best peel, with a peel reference added
-  peel_df <- extract_final(bv_one) |>
+  peel_df <- bv_one |>
     dplyr::mutate(peel = 1) |>
     dplyr::select(peel, dplyr::everything(), -random_start)
 
@@ -87,10 +88,11 @@ peel <- function(ref_mat,
                        rho_threshold = rho_threshold,
                        min_delta_rho = min_delta_rho,
                        corr_method = corr_method,
+                       return_type = 'final',
                        returndf = TRUE,
                        selection_ref = 'name')
 
-    final_one <- extract_final(bv_one) |>
+    final_one <- bv_one |>
       dplyr::mutate(peel = counter) |>
       dplyr::select(peel, dplyr::everything(), -random_start)
 

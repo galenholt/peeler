@@ -10,7 +10,7 @@ test_that("varespec works", {
                    ref_dist = 'bray', comp_dist = 'bray',
                    rand_start = TRUE, nrand = 5)
   expect_s3_class(bvout, 'data.frame')
-  expect_equal(nrow(bvout), 17)
+  expect_equal(nrow(bvout), 18)
   expect_equal(names(bvout), c('step', 'FB', 'num_vars', 'corr', 'species'))
 
 })

@@ -10,8 +10,8 @@ test_that("restarts works", {
                    ref_dist = 'bray', comp_dist = 'bray',
                    rand_start = TRUE, nrand = 5, num_restarts = 10)
   expect_s3_class(bvout, 'data.frame')
-  expect_equal(nrow(bvout), 74) #This will not be the same as purrr, since furrr seeds itself
-  expect_equal(names(bvout), c('random_start', 'step', 'FB', 'num_vars', 'corr', 'species'))
+  expect_equal(nrow(bvout), 5)
+  expect_equal(names(bvout), c('random_start', 'step', 'FB', 'num_vars', 'corr', 'species', 'num_tied_with'))
 
 
 })
@@ -25,7 +25,7 @@ test_that("parallel works", {
                     rand_start = TRUE, nrand = 5, num_restarts = 50)
 
   expect_s3_class(bvout, 'data.frame')
-  expect_equal(names(bvout), c('random_start', 'step', 'FB', 'num_vars', 'corr', 'species'))
+  expect_equal(names(bvout), c('random_start', 'step', 'FB', 'num_vars', 'corr', 'species', 'num_tied_with'))
 
   # reset future plan
   future::plan(future::sequential)
@@ -43,8 +43,36 @@ test_that("purrr works", {
 
     expect_s3_class(bvout, 'data.frame')
 
-    expect_equal(nrow(bvout), 80)
+    expect_equal(nrow(bvout), 5)
 
-    expect_equal(names(bvout), c('random_start', 'step', 'FB', 'num_vars', 'corr', 'species'))
+    expect_equal(names(bvout), c('random_start', 'step', 'FB', 'num_vars', 'corr', 'species', 'num_tied_with'))
+
+})
+
+test_that("return_type 'steps' works", {
+  # This uses furrr, but not parallel
+  set.seed(17)
+  # a <- .Random.seed
+  bvout <- bv_multi(ref_mat = varespec, comp_mat = varespec,
+                    ref_dist = 'bray', comp_dist = 'bray',
+                    rand_start = TRUE, nrand = 5, num_restarts = 10, return_type = 'steps')
+  expect_s3_class(bvout, 'data.frame')
+  expect_equal(nrow(bvout), 76)
+  expect_equal(names(bvout), c('random_start', 'step', 'FB', 'num_vars', 'corr', 'species'))
+
+
+})
+
+test_that("return_type 'unique' works", {
+  # This uses furrr, but not parallel
+  set.seed(17)
+  # a <- .Random.seed
+  bvout <- bv_multi(ref_mat = varespec, comp_mat = varespec,
+                    ref_dist = 'bray', comp_dist = 'bray',
+                    rand_start = TRUE, nrand = 5, num_restarts = 10, return_type = 'unique')
+  expect_s3_class(bvout, 'data.frame')
+  expect_equal(nrow(bvout), 5)
+  expect_equal(names(bvout), c('random_start', 'step', 'FB', 'num_vars', 'corr', 'species', 'num_tied_with'))
+
 
 })

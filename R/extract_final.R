@@ -12,12 +12,16 @@ extract_final <- function(bvout) {
     bvout <- dplyr::bind_rows(bvout, .id = "random_start")
   }
 
+  # The `tiebreak` column prevents the
+  # result from defaulting to alphabetically sorting ties
   bv_final <- bvout |>
     dplyr::group_by(random_start) |>
     dplyr::summarise(across(everything(), dplyr::last)) |>
     dplyr::ungroup() |>
     dplyr::mutate(species = stringr::str_sort(species)) |>
-    dplyr::arrange(desc(corr))
+    dplyr::mutate(tiebreak = stats::runif(n = length(species))) |>
+    dplyr::arrange(num_vars, desc(corr), tiebreak) |>
+    dplyr::select(-tiebreak)
 
   return(bv_final)
 }

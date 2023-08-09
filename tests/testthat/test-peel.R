@@ -12,5 +12,5 @@ test_that("quick check", {
 
   expect_s3_class(peels, 'data.frame')
   expect_equal(nrow(peels), 7)
-  expect_equal(names(peels), c('peel', 'step', 'FB', 'num_vars', 'corr', 'species'))
+  expect_equal(names(peels), c('peel', 'step', 'FB', 'num_vars', 'corr', 'species', 'num_tied_with'))
 })
