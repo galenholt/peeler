@@ -255,11 +255,11 @@ bvstep <- function(ref_mat,
   if (selection_ref == 'index') {
 
     track_steps <- track_steps |>
-      dplyr::mutate(species = species_index(species, comp_mat)) |>
-      dplyr::mutate(species = purrr::map_chr(species, \(x) sort(x)))
+      dplyr::mutate(species = species_index(.data$species, comp_mat)) |>
+      dplyr::mutate(species = purrr::map_chr(.data$species, \(x) sort(x)))
   } else if (selection_ref == 'name') {
     track_steps <- track_steps |>
-      dplyr::mutate(species = purrr::map_chr(species, \(x) paste0(sort(strsplit(x, ', ')[[1]]), collapse = ', ')))
+      dplyr::mutate(species = purrr::map_chr(.data$species, \(x) paste0(sort(strsplit(x, ', ')[[1]]), collapse = ', ')))
   }
   return(track_steps)
 }

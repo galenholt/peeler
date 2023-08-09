@@ -123,10 +123,10 @@ bv_multi <- function(ref_mat,
 
     if (max(to_rank$corr, na.rm = TRUE) >= rho_threshold) {
       to_rank <- to_rank |>
-        dplyr::filter(corr > rho_threshold)
+        dplyr::filter(.data$corr > rho_threshold)
     } else {
       to_rank <- to_rank|>
-        dplyr::filter(corr == max(corr, na.rm = TRUE))
+        dplyr::filter(.data$corr == max(.data$corr, na.rm = TRUE))
     }
   }
 
@@ -136,21 +136,21 @@ bv_multi <- function(ref_mat,
   # rank by number species and then correlation above the threshold, but
   # correlation and then species below it
   to_rank_above <- to_rank |>
-    dplyr::mutate(above_thresh = corr >= rho_threshold) |>
-    dplyr::filter(above_thresh)
+    dplyr::mutate(above_thresh = .data$corr >= rho_threshold) |>
+    dplyr::filter(.data$above_thresh)
 
   to_rank_below <- to_rank |>
-    dplyr::mutate(above_thresh = corr >= rho_threshold) |>
-    dplyr::filter(!above_thresh)
+    dplyr::mutate(above_thresh = .data$corr >= rho_threshold) |>
+    dplyr::filter(!.data$above_thresh)
 
   ranked_best <- to_rank_above |>
-    dplyr::group_by(num_vars, dc = dplyr::desc(corr)) |>
+    dplyr::group_by(.data$num_vars, dc = dplyr::desc(.data$corr)) |>
     dplyr::mutate(rankgroup = dplyr::cur_group_id(),
                   num_tied_with = dplyr::n()) |>
     dplyr::ungroup()  |>
-    dplyr::mutate(tiebreak = stats::runif(n = length(species))) |>
-    dplyr::arrange(num_vars, desc(corr), tiebreak) |>
-    dplyr::select(-tiebreak, -above_thresh)
+    dplyr::mutate(tiebreak = stats::runif(n = length(.data$species))) |>
+    dplyr::arrange(.data$num_vars, dplyr::desc(.data$corr), .data$tiebreak) |>
+    dplyr::select(-.data$tiebreak, -.data$above_thresh)
 
   # Start counting ranks at max group of those above the threshold, but if there aren't any, start at 1
   if (nrow(ranked_best) > 0) {
@@ -161,13 +161,13 @@ bv_multi <- function(ref_mat,
 
   # Rank those below the threshold by correlation and then number of species.
   ranked_below <- to_rank_below |>
-    dplyr::group_by(dc = dplyr::desc(corr), num_vars) |>
+    dplyr::group_by(dc = dplyr::desc(.data$corr), .data$num_vars) |>
     dplyr::mutate(rankgroup = rankstart + dplyr::cur_group_id(),
                   num_tied_with = dplyr::n()) |>
     dplyr::ungroup()  |>
-    dplyr::mutate(tiebreak = stats::runif(n = length(species))) |>
-    dplyr::arrange(desc(corr), num_vars,tiebreak) |>
-    dplyr::select(-tiebreak, -above_thresh)
+    dplyr::mutate(tiebreak = stats::runif(n = length(.data$species))) |>
+    dplyr::arrange(dplyr::desc(.data$corr), .data$num_vars,.data$tiebreak) |>
+    dplyr::select(-.data$tiebreak, -.data$above_thresh)
 
   ranked_best <- dplyr::bind_rows(ranked_best, ranked_below)
 
@@ -176,7 +176,7 @@ bv_multi <- function(ref_mat,
                            ties.method = ties.method) <= num_best_results)
 
   best_set <- ranked_best[best_order, ] |>
-    dplyr::select(-dc, -rankgroup)
+    dplyr::select(-.data$dc, -.data$rankgroup)
 
   if (return_type == 'steps') {
     bvlist <- bvlist[best_set$random_start]

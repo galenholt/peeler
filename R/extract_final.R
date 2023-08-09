@@ -15,13 +15,13 @@ extract_final <- function(bvout) {
   # The `tiebreak` column prevents the
   # result from defaulting to alphabetically sorting ties
   bv_final <- bvout |>
-    dplyr::group_by(random_start) |>
-    dplyr::summarise(across(everything(), dplyr::last)) |>
+    dplyr::group_by(.data$random_start) |>
+    dplyr::summarise(dplyr::across(dplyr::everything(), dplyr::last)) |>
     dplyr::ungroup() |>
-    dplyr::mutate(species = stringr::str_sort(species)) |>
-    dplyr::mutate(tiebreak = stats::runif(n = length(species))) |>
-    dplyr::arrange(num_vars, desc(corr), tiebreak) |>
-    dplyr::select(-tiebreak)
+    dplyr::mutate(species = stringr::str_sort(.data$species)) |>
+    dplyr::mutate(tiebreak = stats::runif(n = length(.data$species))) |>
+    dplyr::arrange(.data$num_vars, dplyr::desc(.data$corr), .data$tiebreak) |>
+    dplyr::select(-.data$tiebreak)
 
   return(bv_final)
 }
