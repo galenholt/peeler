@@ -4,7 +4,7 @@
 #' @param comp_mat variable community matrix
 #' @param ref_distmat reference dissimilarity matrix
 #' @param comp_dist `method` argument to use in [vegan::vegdist()] for dissimilarity
-#' @param corr_method `method` argument to use in [base::cor()] for correlation
+#' @param corr_method `method` argument to use in [stats::cor()] for correlation
 #'
 #' @return correlation value
 #' @export
@@ -18,7 +18,7 @@ distcorr <- function(comp_mat, ref_distmat, comp_dist, corr_method) {
   # Kendall as per Clarke and Warwick 1998
   # use = na.or.complete to get values when there are NaN in the matrices, as
   # there often are especialy for single species.
-  correlation <- cor(ref_distmat, comp_distmat,
+  correlation <- stats::cor(ref_distmat, comp_distmat,
                      method = corr_method, use = 'na.or.complete')
   return(correlation)
 }

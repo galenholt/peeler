@@ -21,7 +21,7 @@ backward_step <- function(remove_sp, comp_mat, initial_sp, ref_distmat, comp_dis
 
   # not max(abs(cors)) because we don't want the strongest relationship, we want
   # the closest resemblance to the full community, and so only want (+)
-  best_cor <- all_cors[which(all_cors == max(all_cors))]
+  best_cor <- all_cors[which(all_cors == max(all_cors, na.rm = TRUE))]
 
   return(best_cor)
 
@@ -36,7 +36,7 @@ backward_step <- function(remove_sp, comp_mat, initial_sp, ref_distmat, comp_dis
 #' @inheritParams backward_step
 #' @param cut_sp single variable to remove
 #'
-#' @return
+#' @return named num, correlation, with name being the removed species
 #' @export
 #'
 #' @examples

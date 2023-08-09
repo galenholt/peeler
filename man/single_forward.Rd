@@ -24,7 +24,10 @@ single_forward(
 
 \item{comp_dist}{\code{method} argument to use in \code{\link[vegan:vegdist]{vegan::vegdist()}} for dissimilarity}
 
-\item{corr_method}{\code{method} argument to use in \code{\link[base:cor]{base::cor()}} for correlation}
+\item{corr_method}{\code{method} argument to use in \code{\link[stats:cor]{stats::cor()}} for correlation}
+}
+\value{
+named number, correlation with the name being the added species
 }
 \description{
 This is run for each possible addition in turn.

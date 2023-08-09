@@ -57,7 +57,7 @@ bvstep <- function(ref_mat,
 
   # find the starting sample- either a random set or the best individual sample
   if (rand_start) {
-    if (nrand < ncol(comp_mat)) {
+    if (nrand <= ncol(comp_mat)) {
 
       start_set <- sample(colnames(comp_mat), nrand)
 
@@ -131,9 +131,6 @@ bvstep <- function(ref_mat,
   # Now we need the logic for continuing, and inside that, the forward/backward logic
   while (current_cor < rho_threshold & deltarho > min_delta_rho & !final_back) {
 
-    if (counter > 30) {
-      a <- 1
-    }
     # Do a forward step if we start with a single species, or if the backward selection has finished and set the nextstep flag to 'forward'
     if (length(current_set) == 1 | nextstep == 'forward') {
       steptype <- 'F'
@@ -148,6 +145,12 @@ bvstep <- function(ref_mat,
       if (length(new_cor) > 1) {
         new_cor <- sample(new_cor, 1)
       }
+
+      if (is.infinite(new_cor) | new_cor == 0) {
+        a <- 1
+      }
+
+
       new_set <- c(current_set, names(new_cor))
 
       # forward only ever happens once. It effectively happens twice when we start
@@ -208,10 +211,6 @@ bvstep <- function(ref_mat,
                               ref_distmat = ref_dissim,
                               comp_dist = comp_dist,
                               corr_method)
-
-      if (length(new_cor) == 0) {
-        a <- 1
-      }
 
       # sometimes we pick up two identical corrs. If that's the case, pick one at random
       if (length(new_cor) > 1) {

@@ -14,7 +14,7 @@ extract_final <- function(bvout) {
 
   bv_final <- bvout |>
     dplyr::group_by(random_start) |>
-    dplyr::summarise(across(everything(), last)) |>
+    dplyr::summarise(across(everything(), dplyr::last)) |>
     dplyr::ungroup() |>
     dplyr::mutate(species = stringr::str_sort(species)) |>
     dplyr::arrange(desc(corr))

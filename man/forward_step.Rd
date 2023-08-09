@@ -15,7 +15,7 @@ forward_step(comp_mat, initial_sp, ref_distmat, comp_dist, corr_method)
 
 \item{comp_dist}{\code{method} argument to use in \code{\link[vegan:vegdist]{vegan::vegdist()}} for dissimilarity}
 
-\item{corr_method}{\code{method} argument to use in \code{\link[base:cor]{base::cor()}} for correlation}
+\item{corr_method}{\code{method} argument to use in \code{\link[stats:cor]{stats::cor()}} for correlation}
 }
 \value{
 named number, with the name of the best variable to add and the

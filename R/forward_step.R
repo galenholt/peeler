@@ -17,7 +17,7 @@ forward_step <- function(comp_mat, initial_sp, ref_distmat, comp_dist, corr_meth
   all_cors <- sapply(names_to_loop,
                      FUN = \(x) single_forward(x, comp_mat, initial_sp, ref_distmat, comp_dist, corr_method))
 
-  best_cor <- all_cors[which(all_cors == max(abs(all_cors)))]
+  best_cor <- all_cors[which(all_cors == max(all_cors, na.rm = TRUE))]
 
   return(best_cor)
 
@@ -32,7 +32,7 @@ forward_step <- function(comp_mat, initial_sp, ref_distmat, comp_dist, corr_meth
 #' @inheritParams forward_step
 #' @param add_sp single variable to add
 #'
-#' @return
+#' @return named number, correlation with the name being the added species
 #' @export
 #'
 #' @examples

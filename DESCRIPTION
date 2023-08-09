@@ -1,10 +1,10 @@
 Package: peeler
-Title: What the Package Does (One Line, Title Case)
+Title: Implements peeling community datasets using sequential bvstep algorithms, as in Clarke and Warwick 1998
 Version: 0.0.0.9000
 Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
+    person("Galen", "Holt", , "g.holt@deakin.edu.au", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0002-7455-9275"))
+Description: This package provides implementations of the bvstep forward/backward algorithm to find the best subset of the data that matches the full community. It further provides functions to iterate that algorithm over some number of random starts to assess consistency. The `peel` function then uses these to iteratively find the best subset and remove it.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
@@ -17,6 +17,7 @@ Imports:
     glue,
     purrr,
     rlang,
+    stringr,
     tibble,
     vegan
 Suggests: 

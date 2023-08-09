@@ -1,0 +1,80 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# peeler
+
+<!-- badges: start -->
+[![R-CMD-check](https://github.com/galenholt/peeler/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/galenholt/peeler/actions/workflows/R-CMD-check.yaml)
+<!-- badges: end -->
+
+Peeler implements the bvstep algorithm from Clarke and Warwick 1998 and uses it to 'peel' a dataset to find structural redundancy. It also provides a way to randomly start bvstep many times to assess consistency and avoid local optima.
+
+## Installation
+
+You can install the development version of peeler from [GitHub](https://github.com/) with:
+
+``` r
+# install.packages("devtools")
+devtools::install_github("galenholt/peeler")
+```
+
+## Example
+
+
+
+```{r example}
+library(peeler)
+library(vegan)
+data(varespec)
+```
+
+You can use `bvstep` alone
+
+```{r}
+bvout <- bvstep(ref_mat = varespec, comp_mat = varespec,
+                   ref_dist = 'bray', comp_dist = 'bray',
+                   rand_start = TRUE, nrand = 5)
+bvout
+```
+
+The `bv_multi` function runs bvstep for a number of random starts to avoid local optima, here with 5 species to start, iterated 10 times.
+
+```{r}
+bv_m <- bv_multi(ref_mat = varespec, comp_mat = varespec,
+                   ref_dist = 'bray', comp_dist = 'bray',
+                   rand_start = TRUE, nrand = 5, num_restarts = 10)
+bv_m
+```
+
+And finally, `peel` runs `bv_multi` iteratively, removing the best set each time.
+```{r}
+peels <- peel(ref_mat = varespec,
+                comp_mat = varespec,
+                nrand = 6,
+                num_restarts = 10,
+                corr_method = 'spearman')
+peels
+```
+
+There are a number of user-defineable options in each of those functions, see their documentation.
+
+THere are also two potentially useful helper functions, `extract_final`, which gets the last step in `bvstep` output, and `extract_names`. The `bvstep` output has names in a single string with comma-separated species names, and we often want them as a character vector. The `extract_names` function parses this.
+
+```{r}
+extract_names(bvout, step = 'last')
+```
+
+
+

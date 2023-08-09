@@ -6,9 +6,9 @@ test_that("varespec works", {
 
   set.seed(17)
   # a <- .Random.seed
-  bvout <- (bvstep(ref_mat = varespec, comp_mat = varespec,
+  bvout <- bvstep(ref_mat = varespec, comp_mat = varespec,
                    ref_dist = 'bray', comp_dist = 'bray',
-                   rand_start = TRUE, nrand = 5))
+                   rand_start = TRUE, nrand = 5)
   expect_s3_class(bvout, 'data.frame')
   expect_equal(nrow(bvout), 17)
   expect_equal(names(bvout), c('step', 'FB', 'num_vars', 'corr', 'species'))

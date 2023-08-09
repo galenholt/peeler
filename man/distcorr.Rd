@@ -14,7 +14,7 @@ distcorr(comp_mat, ref_distmat, comp_dist, corr_method)
 
 \item{comp_dist}{\code{method} argument to use in \code{\link[vegan:vegdist]{vegan::vegdist()}} for dissimilarity}
 
-\item{corr_method}{\code{method} argument to use in \code{\link[base:cor]{base::cor()}} for correlation}
+\item{corr_method}{\code{method} argument to use in \code{\link[stats:cor]{stats::cor()}} for correlation}
 }
 \value{
 correlation value
