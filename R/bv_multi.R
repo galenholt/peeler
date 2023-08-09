@@ -3,7 +3,9 @@
 #'
 #' Runs [bvstep()] a number of times with random starts, sorts the outcomes by
 #' correlation, and returns the best `num_best_results` as either a list or
-#' dataframe.
+#' dataframe. This uses {furrr} if it is installed, and so allows the user to
+#' run each set of randon starts in parallel by setting a `[future::plan()]`, e.g.
+#' `plan(multisession)` before running this code.
 #'
 #'
 #' @inheritParams bvstep

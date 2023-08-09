@@ -81,5 +81,7 @@ dataframe or list, as determined by \code{returndf}, of the best
 \description{
 Runs \code{\link[=bvstep]{bvstep()}} a number of times with random starts, sorts the outcomes by
 correlation, and returns the best \code{num_best_results} as either a list or
-dataframe.
+dataframe. This uses {furrr} if it is installed, and so allows the user to
+run each set of randon starts in parallel by setting a \verb{[future::plan()]}, e.g.
+\code{plan(multisession)} before running this code.
 }
