@@ -12,6 +12,7 @@ test_that("varespec works", {
   expect_s3_class(bvout, 'data.frame')
   expect_equal(nrow(bvout), 18)
   expect_equal(names(bvout), c('step', 'FB', 'num_vars', 'corr', 'species'))
+  expect_true(count_test(bvout))
 
 })
 
@@ -26,6 +27,7 @@ test_that("fixed_start works", {
   expect_s3_class(bvout, 'data.frame')
   expect_equal(bvout$species[1], "Pohlnuta, Polycomm")
   expect_equal(names(bvout), c('step', 'FB', 'num_vars', 'corr', 'species'))
+  expect_true(count_test(bvout))
 
 })
 
@@ -40,6 +42,7 @@ test_that("fixed_start with random works", {
   expect_s3_class(bvout, 'data.frame')
   expect_equal(bvout$species[1], "Cladamau, Cladcris, Icmaeric, Peltapht, Pohlnuta, Polycomm, Stersp")
   expect_equal(names(bvout), c('step', 'FB', 'num_vars', 'corr', 'species'))
+  expect_true(count_test(bvout))
 
 })
 
@@ -55,6 +58,7 @@ test_that("best start works", {
   expect_s3_class(bvout, 'data.frame')
   expect_equal(bvout$species[1], "Pleuschr")
   expect_equal(names(bvout), c('step', 'FB', 'num_vars', 'corr', 'species'))
+  expect_true(count_test(bvout))
 
 })
 # Need to test a force_include with all species and see if it goes infinite

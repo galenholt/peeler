@@ -12,7 +12,7 @@ test_that("restarts works", {
   expect_s3_class(bvout, 'data.frame')
   expect_equal(nrow(bvout), 5)
   expect_equal(names(bvout), c('random_start', 'step', 'FB', 'num_vars', 'corr', 'species', 'num_tied_with'))
-
+  expect_true(count_test(bvout))
 
 })
 
@@ -26,7 +26,7 @@ test_that("parallel works", {
 
   expect_s3_class(bvout, 'data.frame')
   expect_equal(names(bvout), c('random_start', 'step', 'FB', 'num_vars', 'corr', 'species', 'num_tied_with'))
-
+  expect_true(count_test(bvout))
   # reset future plan
   future::plan(future::sequential)
 
@@ -46,6 +46,7 @@ test_that("purrr works", {
     expect_equal(nrow(bvout), 5)
 
     expect_equal(names(bvout), c('random_start', 'step', 'FB', 'num_vars', 'corr', 'species', 'num_tied_with'))
+    expect_true(count_test(bvout))
 
 })
 
@@ -55,11 +56,11 @@ test_that("return_type 'steps' works", {
   # a <- .Random.seed
   bvout <- bv_multi(ref_mat = varespec, comp_mat = varespec,
                     ref_dist = 'bray', comp_dist = 'bray',
-                    rand_start = TRUE, nrand = 5, num_restarts = 10, return_type = 'steps')
+                    rand_start = TRUE, nrand = 5, num_restarts = 50, return_type = 'steps')
   expect_s3_class(bvout, 'data.frame')
-  expect_equal(nrow(bvout), 76)
+  expect_equal(nrow(bvout), 74)
   expect_equal(names(bvout), c('random_start', 'step', 'FB', 'num_vars', 'corr', 'species'))
-
+  expect_true(count_test(bvout))
 
 })
 
@@ -69,10 +70,10 @@ test_that("return_type 'unique' works", {
   # a <- .Random.seed
   bvout <- bv_multi(ref_mat = varespec, comp_mat = varespec,
                     ref_dist = 'bray', comp_dist = 'bray',
-                    rand_start = TRUE, nrand = 5, num_restarts = 10, return_type = 'unique')
+                    rand_start = TRUE, nrand = 5, num_restarts = 50, return_type = 'unique')
   expect_s3_class(bvout, 'data.frame')
   expect_equal(nrow(bvout), 5)
   expect_equal(names(bvout), c('random_start', 'step', 'FB', 'num_vars', 'corr', 'species', 'num_tied_with'))
-
+  expect_true(count_test(bvout))
 
 })
