@@ -6,3 +6,4 @@
 notebooks/
 ^README\.Rmd$
 ^\.github$
+^codecov\.yml$

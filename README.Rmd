@@ -17,6 +17,7 @@ knitr::opts_chunk$set(
 
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/galenholt/peeler/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/galenholt/peeler/actions/workflows/R-CMD-check.yaml)
+[![Codecov test coverage](https://codecov.io/gh/galenholt/peeler/branch/master/graph/badge.svg)](https://app.codecov.io/gh/galenholt/peeler?branch=master)
 <!-- badges: end -->
 
 Peeler implements the bvstep algorithm from Clarke and Warwick 1998 and uses it to 'peel' a dataset to find structural redundancy. It also provides a way to randomly start bvstep many times to assess consistency and avoid local optima.
