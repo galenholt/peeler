@@ -19,3 +19,12 @@ To match PRIMER, the names are included as a single string with comma
 separation. For further use, though, we need to parse that back to a
 character vector
 }
+\examples{
+require(vegan)
+data(varespec)
+bvout <- bvstep(ref_mat = varespec, comp_mat = varespec,
+ref_dist = 'bray', comp_dist = 'bray',
+rand_start = TRUE, nrand = 5)
+best_set <- extract_names(bvout)
+
+}

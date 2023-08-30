@@ -43,25 +43,23 @@ bvout <- bvstep(ref_mat = varespec, comp_mat = varespec,
                    ref_dist = 'bray', comp_dist = 'bray',
                    rand_start = TRUE, nrand = 5)
 bvout
-#> # A tibble: 16 × 5
+#> # A tibble: 14 × 5
 #>     step FB    num_vars  corr species                                           
 #>    <dbl> <chr>    <int> <dbl> <chr>                                             
-#>  1     1 <NA>         5 0.149 Cladchlo, Cladunci, Empenigr, Pohlnuta, Polycomm  
-#>  2     2 B            4 0.171 Cladchlo, Cladunci, Pohlnuta, Polycomm            
-#>  3     3 F            5 0.431 Cladchlo, Cladunci, Pleuschr, Pohlnuta, Polycomm  
-#>  4     4 F            6 0.594 Cladchlo, Cladstel, Cladunci, Pleuschr, Pohlnuta,…
-#>  5     5 F            7 0.735 Cladchlo, Cladrang, Cladstel, Cladunci, Pleuschr,…
-#>  6     6 B            6 0.735 Cladchlo, Cladrang, Cladstel, Cladunci, Pleuschr,…
-#>  7     7 F            7 0.774 Cladchlo, Cladrang, Cladstel, Cladunci, Empenigr,…
-#>  8     8 F            8 0.818 Cladarbu, Cladchlo, Cladrang, Cladstel, Cladunci,…
-#>  9     9 F            9 0.862 Cladarbu, Cladchlo, Cladrang, Cladstel, Cladunci,…
-#> 10    10 B            8 0.863 Cladarbu, Cladchlo, Cladrang, Cladstel, Cladunci,…
-#> 11    11 F            9 0.891 Cladarbu, Cladchlo, Cladrang, Cladstel, Cladunci,…
-#> 12    12 B            8 0.891 Cladarbu, Cladrang, Cladstel, Cladunci, Dicrfusc,…
-#> 13    13 F            9 0.911 Cladarbu, Cladrang, Cladstel, Cladunci, Dicrfusc,…
-#> 14    14 F           10 0.933 Cladarbu, Cladrang, Cladstel, Cladunci, Dicrfusc,…
-#> 15    15 F           11 0.947 Callvulg, Cladarbu, Cladrang, Cladstel, Cladunci,…
-#> 16    16 F           12 0.955 Callvulg, Cladarbu, Cladrang, Cladstel, Cladunci,…
+#>  1     1 <NA>         5 0.387 Cladamau, Cladcerv, Cladrang, Empenigr, Vacculig  
+#>  2     2 B            4 0.388 Cladamau, Cladcerv, Cladrang, Empenigr            
+#>  3     3 B            3 0.388 Cladcerv, Cladrang, Empenigr                      
+#>  4     4 B            2 0.388 Cladrang, Empenigr                                
+#>  5     5 F            3 0.633 Cladrang, Cladstel, Empenigr                      
+#>  6     6 F            4 0.768 Cladrang, Cladstel, Empenigr, Pleuschr            
+#>  7     7 F            5 0.808 Cladarbu, Cladrang, Cladstel, Empenigr, Pleuschr  
+#>  8     8 F            6 0.855 Cladarbu, Cladrang, Cladstel, Empenigr, Pleuschr,…
+#>  9     9 F            7 0.880 Cladarbu, Cladrang, Cladstel, Dicrfusc, Empenigr,…
+#> 10    10 F            8 0.900 Cladarbu, Cladrang, Cladstel, Dicrfusc, Empenigr,…
+#> 11    11 F            9 0.920 Cladarbu, Cladrang, Cladstel, Dicrfusc, Dicrsp, E…
+#> 12    12 F           10 0.933 Cladarbu, Cladrang, Cladstel, Cladunci, Dicrfusc,…
+#> 13    13 F           11 0.947 Callvulg, Cladarbu, Cladrang, Cladstel, Cladunci,…
+#> 14    14 F           12 0.955 Callvulg, Cladarbu, Cladrang, Cladstel, Cladunci,…
 ```
 
 ## Random starts to explore the space
@@ -86,11 +84,11 @@ bv_m
 #> # A tibble: 5 × 7
 #>   random_start  step FB    num_vars  corr species                  num_tied_with
 #>   <chr>        <dbl> <chr>    <int> <dbl> <chr>                            <int>
-#> 1 2               14 B           12 0.955 Callvulg, Cladarbu, Cla…             6
-#> 2 4               18 F           12 0.955 Callvulg, Cladarbu, Cla…             6
-#> 3 5               16 B           12 0.955 Callvulg, Cladarbu, Cla…             6
-#> 4 6               18 F           12 0.955 Callvulg, Cladarbu, Cla…             6
-#> 5 10              14 B           12 0.955 Callvulg, Cladarbu, Cla…             6
+#> 1 3               18 B           12 0.955 Callvulg, Cladarbu, Cla…             7
+#> 2 2               18 B           12 0.955 Callvulg, Cladarbu, Cla…             7
+#> 3 1               16 F           12 0.955 Callvulg, Cladarbu, Cla…             7
+#> 4 5               16 F           12 0.955 Callvulg, Cladarbu, Cla…             7
+#> 5 8               18 B           12 0.955 Callvulg, Cladarbu, Cla…             7
 ```
 
 The default `return_type = 'final'` gives the best outcome of each
@@ -105,20 +103,20 @@ bv_steps <- bv_multi(ref_mat = varespec, comp_mat = varespec,
                  return_type = 'steps',
                    rand_start = TRUE, nrand = 5, num_restarts = 10)
 bv_steps
-#> # A tibble: 80 × 6
+#> # A tibble: 72 × 6
 #>    random_start  step FB    num_vars   corr species                             
 #>    <chr>        <dbl> <chr>    <int>  <dbl> <chr>                               
-#>  1 6                1 <NA>         5 0.0476 Claddefo, Cladsp, Flavniva, Peltaph…
-#>  2 6                2 B            4 0.197  Cladsp, Flavniva, Peltapht, Polypili
-#>  3 6                3 B            3 0.200  Flavniva, Peltapht, Polypili        
-#>  4 6                4 B            2 0.205  Flavniva, Polypili                  
-#>  5 6                5 F            3 0.375  Flavniva, Pleuschr, Polypili        
-#>  6 6                6 B            2 0.378  Pleuschr, Polypili                  
-#>  7 6                7 B            1 0.381  Pleuschr                            
-#>  8 6                8 F            2 0.579  Cladrang, Pleuschr                  
-#>  9 6                9 F            3 0.732  Cladrang, Cladstel, Pleuschr        
-#> 10 6               10 F            4 0.779  Cladrang, Cladstel, Pleuschr, Vaccv…
-#> # ℹ 70 more rows
+#>  1 2                1 <NA>         5 0.0849 Cetrisla, Cladbotr, Cladcerv, Diphc…
+#>  2 2                2 B            4 0.119  Cladbotr, Cladcerv, Diphcomp, Flavn…
+#>  3 2                3 B            3 0.145  Cladbotr, Cladcerv, Flavniva        
+#>  4 2                4 B            2 0.169  Cladbotr, Flavniva                  
+#>  5 2                5 F            3 0.375  Cladbotr, Cladrang, Flavniva        
+#>  6 2                6 F            4 0.592  Cladbotr, Cladrang, Cladstel, Flavn…
+#>  7 2                7 F            5 0.735  Cladbotr, Cladrang, Cladstel, Flavn…
+#>  8 2                8 F            6 0.776  Cladbotr, Cladrang, Cladstel, Flavn…
+#>  9 2                9 B            5 0.779  Cladbotr, Cladrang, Cladstel, Pleus…
+#> 10 2               10 F            6 0.832  Cladarbu, Cladbotr, Cladrang, Clads…
+#> # ℹ 62 more rows
 ```
 
 With `return_type = 'unique'`, we return the best `num_best_results`
@@ -137,11 +135,11 @@ bv_unique
 #> # A tibble: 5 × 7
 #>   random_start  step FB    num_vars  corr species                  num_tied_with
 #>   <chr>        <dbl> <chr>    <int> <dbl> <chr>                            <int>
-#> 1 6               14 F           12 0.955 Callvulg, Cladarbu, Cla…             5
-#> 2 7               18 B           12 0.955 Callvulg, Cladarbu, Cla…             5
-#> 3 2               18 F           12 0.955 Callvulg, Cladarbu, Cla…             5
-#> 4 9               14 F           12 0.955 Callvulg, Cladarbu, Cla…             5
-#> 5 10              14 F           12 0.955 Callvulg, Cladarbu, Cla…             5
+#> 1 4               14 F           12 0.955 Callvulg, Cladarbu, Cla…             7
+#> 2 6               12 F           12 0.955 Callvulg, Cladarbu, Cla…             7
+#> 3 1               14 F           12 0.955 Callvulg, Cladarbu, Cla…             7
+#> 4 8               16 B           12 0.955 Callvulg, Cladarbu, Cla…             7
+#> 5 2               14 B           12 0.955 Callvulg, Cladarbu, Cla…             7
 ```
 
 ## Peels
@@ -159,12 +157,12 @@ peels
 #> # A tibble: 7 × 7
 #>    peel  step FB    num_vars   corr species                        num_tied_with
 #>   <dbl> <dbl> <chr>    <int>  <dbl> <chr>                                  <int>
-#> 1     1     8 F            5  0.962 Cladarbu, Cladrang, Cladstel,…             2
-#> 2     2    12 F           11  0.687 Cladbotr, Cladchlo, Claddefo,…             1
-#> 3     3    16 F            7  0.407 Betupube, Cetrisla, Cladcerv,…             1
-#> 4     4    11 F            8  0.321 Barbhatc, Callvulg, Cladamau,…             3
-#> 5     5     6 F            5  0.284 Cladcorn, Cladcris, Descflex,…             1
-#> 6     6     5 F            4  0.132 Cetreric, Cladcocc, Empenigr,…             7
+#> 1     1     7 B            6  0.964 Cladarbu, Cladrang, Cladstel,…             1
+#> 2     2    18 F           11  0.686 Cladchlo, Cladgrac, Cladunci,…             6
+#> 3     3     9 F            6  0.351 Callvulg, Cladbotr, Cladphyl,…             1
+#> 4     4     7 F            6  0.330 Betupube, Cladcris, Cladsp, I…             1
+#> 5     5    13 F            8  0.202 Barbhatc, Cetrisla, Cladcerv,…             1
+#> 6     6     6 F            3  0.119 Cetreric, Cladamau, Empenigr               7
 #> 7     7     1 <NA>         4 -0.139 Cladfimb, Diphcomp, Pinusylv,…             1
 ```
 

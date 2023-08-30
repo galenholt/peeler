@@ -71,3 +71,12 @@ a tibble
 \description{
 Iteratively run bv_multi, removing the best set of species at each step
 }
+\examples{
+require(vegan)
+data(varespec)
+peels <- peel(ref_mat = varespec,
+comp_mat = varespec,
+nrand = 6,
+num_restarts = 10,
+corr_method = 'spearman')
+}

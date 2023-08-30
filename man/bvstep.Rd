@@ -57,3 +57,10 @@ a data frame (tibble) with the iteration, whether it was forward/backward, corre
 \description{
 If we start with \code{rand_start} and \code{nrand} is more than 1, this starts with backward steps. If there is only a single column start (e.g. \code{rand_start = FALSE}) or only \code{force_include}, starts with forward selection. Note that though there is only ever a single forward step before backward, backward steps do not get saved into the dataframe if they do not increase rho, and forward steps do not get entered if they increase rho by less than \code{min_delta_rho} (and the steps then terminate).
 }
+\examples{
+require(vegan)
+data(varespec)
+bvout <- bvstep(ref_mat = varespec, comp_mat = varespec,
+ref_dist = 'bray', comp_dist = 'bray',
+rand_start = TRUE, nrand = 5)
+}
