@@ -38,6 +38,12 @@
 #' @export
 #'
 #' @examples
+#' require(vegan)
+#' data(varespec)
+#' bvout <- bv_multi(ref_mat = varespec, comp_mat = varespec,
+#' ref_dist = 'bray', comp_dist = 'bray',
+#' rand_start = TRUE, nrand = 5, num_restarts = 10)
+#'
 bv_multi <- function(ref_mat,
                      comp_mat,
                      ref_dist = 'bray',
@@ -85,6 +91,7 @@ bv_multi <- function(ref_mat,
                                                             selection_ref = selection_ref),
                                 .options = furrr::furrr_options(seed = TRUE))
   } else {
+
     bvlist <- purrr::map(1:num_restarts, \(i) bvstep(ref_mat = ref_mat,
                                                      comp_mat = comp_mat,
                                                      ref_dist = ref_dist,

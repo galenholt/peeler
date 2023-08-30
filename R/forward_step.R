@@ -10,7 +10,6 @@
 #'   correlation value with it included.
 #' @export
 #'
-#' @examples
 forward_step <- function(comp_mat, initial_sp, ref_distmat, comp_dist, corr_method) {
   names_to_loop <- colnames(comp_mat)[!(colnames(comp_mat) %in% initial_sp)]
 
@@ -35,7 +34,6 @@ forward_step <- function(comp_mat, initial_sp, ref_distmat, comp_dist, corr_meth
 #' @return named number, correlation with the name being the added species
 #' @export
 #'
-#' @examples
 single_forward <- function(add_sp, comp_mat, initial_sp, ref_distmat, comp_dist, corr_method) {
   check_mat <- comp_mat[,c(initial_sp, add_sp), drop = FALSE]
   correlation <- distcorr(check_mat, ref_distmat, comp_dist, corr_method)

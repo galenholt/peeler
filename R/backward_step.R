@@ -12,7 +12,6 @@
 #'   correlation value with it removed.
 #' @export
 #'
-#' @examples
 backward_step <- function(remove_sp, comp_mat, initial_sp, ref_distmat, comp_dist, corr_method) {
 
   # in a backwards step, we cut each of the initial species in turn
@@ -39,7 +38,6 @@ backward_step <- function(remove_sp, comp_mat, initial_sp, ref_distmat, comp_dis
 #' @return named num, correlation, with name being the removed species
 #' @export
 #'
-#' @examples
 single_backward <- function(cut_sp, comp_mat, initial_sp, ref_distmat, comp_dist, corr_method) {
 
   check_mat <- comp_mat[,initial_sp[!(initial_sp %in% cut_sp)], drop = FALSE]

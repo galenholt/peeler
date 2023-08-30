@@ -5,7 +5,6 @@
 #' @return dataframe
 #' @export
 #'
-#' @examples
 extract_final <- function(bvout) {
   # if not a dataframe, make it one
   if (!inherits(bvout, 'data.frame')) {

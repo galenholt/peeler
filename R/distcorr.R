@@ -9,7 +9,6 @@
 #' @return correlation value
 #' @export
 #'
-#' @examples
 distcorr <- function(comp_mat, ref_distmat, comp_dist, corr_method) {
   # This often throws warnings about empty rows, NaN, especially for single
   # species. Should catch those, package them up, and return somethign more

@@ -12,6 +12,13 @@
 #' @export
 #'
 #' @examples
+#' require(vegan)
+#' data(varespec)
+#' bvout <- bvstep(ref_mat = varespec, comp_mat = varespec,
+#' ref_dist = 'bray', comp_dist = 'bray',
+#' rand_start = TRUE, nrand = 5)
+#' best_set <- extract_names(bvout)
+#'
 extract_names <- function(bvout, step = 'last') {
   # if not a dataframe, make it one
   if (!inherits(bvout, 'data.frame')) {

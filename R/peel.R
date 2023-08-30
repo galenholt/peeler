@@ -12,6 +12,13 @@
 #' @export
 #'
 #' @examples
+#' require(vegan)
+#' data(varespec)
+#' peels <- peel(ref_mat = varespec,
+#' comp_mat = varespec,
+#' nrand = 6,
+#' num_restarts = 10,
+#' corr_method = 'spearman')
 peel <- function(ref_mat,
                  comp_mat,
                  ref_dist = 'bray',
