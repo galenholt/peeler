@@ -22,6 +22,11 @@
 #' @export
 #'
 #' @examples
+#' require(vegan)
+#' data(varespec)
+#' bvout <- bvstep(ref_mat = varespec, comp_mat = varespec,
+#' ref_dist = 'bray', comp_dist = 'bray',
+#' rand_start = TRUE, nrand = 5)
 bvstep <- function(ref_mat,
                    comp_mat,
                    ref_dist = 'bray',
@@ -55,30 +60,67 @@ bvstep <- function(ref_mat,
   # get the reference distance matrix
   ref_dissim <- vegan::vegdist(ref_mat, method = ref_dist)
 
+  # If no species are at multiple sites, everything falls over (distance matrices yield 1s and cor is NA)
+  if (all(colSums(comp_mat > 0) == 1)) {
+    rlang::abort("No species is at multiple sites. Distance matrices and correlations will collapse. Check your data")
+  }
+
   # find the starting sample- either a random set or the best individual sample
   if (rand_start) {
     if (nrand <= ncol(comp_mat)) {
-
-      start_set <- sample(colnames(comp_mat), nrand)
 
       # Force including and random starts will be additive- ie we choose some
       # random set on top of the forced
       if (!is.null(force_include) | !is.null(fixed_start)) {
         rlang::inform(glue::glue("Choosing {nrand} random species in addition to
                     {length(force_include)} forced inclusions and
-                    {length(fixed_start)} fixed starting groups
-                    for a total starting number of
-                    {length(unique(c(force_include, fixed_start, start_set)))}.
-                      This may not be the sum if variables appear in more than
+                    {length(fixed_start)} fixed starting groups.
+                    The initial set length may not be the sum if variables appear in more than
                       one of the groups "))
-        start_set <- unique(c(force_include, fixed_start, start_set))
+        fixed_start_set <- unique(c(force_include, fixed_start))
 
       }
 
-      check_mat <- comp_mat[,start_set, drop = FALSE]
+      # Distance matrices and correlations will collapse if we happen to choose
+      # a set with species that are only at one site. So if that's the case,
+      # keep looking.
+      no_multisite <- TRUE
+      counter = 1
+      while (no_multisite & (counter <= min(100, ncol(comp_mat)))) {
+
+        rand_start_set <- sample(colnames(comp_mat), nrand)
+        start_set <- unique(c(force_include, fixed_start, rand_start_set))
+        check_mat <- comp_mat[,start_set, drop = FALSE]
+        no_multisite <- all(colSums(check_mat > 0) == 1)
+
+        # helpful for debug.
+        # if (no_multisite) {
+        #   print(glue::glue("failed the {counter} time, trying again."))
+        # }
+
+        counter <- counter + 1
+      }
+
+      # if we still havent' picked something up purely randomly by the time we've hit the
+      # counter cutoff, stuff in one we know works
+      if (no_multisite) {
+        multisitespecies <- which(colSums(comp_mat > 0) > 1)
+
+        ringer <- sample(names(multisitespecies), 1)
+        rand_start_set <- sample(colnames(comp_mat), nrand-1)
+
+        start_set <- unique(c(force_include, fixed_start, rand_start_set, ringer))
+        check_mat <- comp_mat[,start_set, drop = FALSE]
+      }
+
       current_cor <- distcorr(comp_mat = check_mat, ref_distmat = ref_dissim,
                              comp_dist = comp_dist,
                              corr_method)
+
+      if (is.na(current_cor)) {
+        rlang::abort("correlation between starting set and the reference are NA. Likely due to sparse data.")
+      }
+
       current_set <- colnames(check_mat)
       nextstep <- 'back'
     } else {
@@ -208,9 +250,17 @@ bvstep <- function(ref_mat,
                               comp_dist = comp_dist,
                               corr_method)
 
+
       # sometimes we pick up two identical corrs. If that's the case, pick one at random
       if (length(new_cor) > 1) {
         new_cor <- sample(new_cor, 1)
+      }
+
+      # I don't think this can happen, provided the previous step had at least one working corr, but an error catch here for the situation where all corrs are NA
+      if (is.na(new_cor)) {
+        rlang::abort(glue::glue("all correlations in backstep at counter {counter} are NA.
+                                This is often due to having only unique species in each site,
+                                but it's unclear how it would happen if step 1 worked."))
       }
 
       new_set <- current_set[!(current_set %in% names(new_cor))]
