@@ -164,11 +164,17 @@ bvstep <- function(ref_mat,
                                 num_vars = length(current_set),
                                 corr = current_cor, species = paste0(current_set, collapse = ', '))
 
-  # To start, just call the first deltarho rho
-  deltarho <- current_cor
+  # To start, give it a deltarho > minimum
+  deltarho <- min_delta_rho + 1
   # set the final_back flag to FALSE- this gives the backstep one more chance
   # after forward crosses the rho_threshold
   final_back <- FALSE
+
+  # if we only have one species, we can't step forward or backward. Just return
+  # it as-is by setting final_back to TRUE
+  if (ncol(comp_mat) == 1) {
+    final_back <- TRUE
+  }
 
   # Now we need the logic for continuing, and inside that, the forward/backward logic
   while (current_cor < rho_threshold & deltarho > min_delta_rho & !final_back) {
@@ -249,7 +255,6 @@ bvstep <- function(ref_mat,
                               ref_distmat = ref_dissim,
                               comp_dist = comp_dist,
                               corr_method)
-
 
       # sometimes we pick up two identical corrs. If that's the case, pick one at random
       if (length(new_cor) > 1) {
