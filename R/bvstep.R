@@ -85,8 +85,8 @@ bvstep <- function(ref_mat,
       # a set with species that are only at one site. So if that's the case,
       # keep looking.
       no_multisite <- TRUE
-      counter = 1
-      while (no_multisite & (counter <= min(100, ncol(comp_mat)))) {
+      singlecounter <- 1
+      while (no_multisite & (singlecounter <= min(100, ncol(comp_mat)))) {
 
         rand_start_set <- sample(colnames(comp_mat), nrand)
         start_set <- unique(c(force_include, fixed_start, rand_start_set))
@@ -98,7 +98,7 @@ bvstep <- function(ref_mat,
         #   print(glue::glue("failed the {counter} time, trying again."))
         # }
 
-        counter <- counter + 1
+        singlecounter <- singlecounter + 1
       }
 
       # if we still havent' picked something up purely randomly by the time we've hit the
