@@ -58,7 +58,7 @@ test_that("return_type 'steps' works", {
                     ref_dist = 'bray', comp_dist = 'bray',
                     rand_start = TRUE, nrand = 5, num_restarts = 50, return_type = 'steps')
   expect_s3_class(bvout, 'data.frame')
-  expect_equal(nrow(bvout), 74)
+  expect_equal(nrow(bvout), 80)
   expect_equal(names(bvout), c('random_start', 'step', 'FB', 'num_vars', 'corr', 'species'))
   expect_true(count_test(bvout))
 

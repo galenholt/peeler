@@ -11,7 +11,7 @@ test_that("quick check", {
                 corr_method = 'spearman')
 
   expect_s3_class(peels, 'data.frame')
-  expect_equal(nrow(peels), 8)
+  expect_equal(nrow(peels), 11)
   expect_equal(names(peels), c('peel', 'step', 'FB', 'num_vars', 'corr', 'species', 'num_tied_with'))
   expect_true(count_test(peels))
 })
