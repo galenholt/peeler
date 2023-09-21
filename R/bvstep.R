@@ -284,7 +284,7 @@ bvstep <- function(ref_mat,
       # think the output would get confusing (and PRIMER doesn't give the failed
       # backsteps)
 
-      if (back_deltarho <= 0) {
+      if (back_deltarho < 0) {
         nextstep <- 'forward'
         # If we're on the final_back and it doesn't help, set it to false so the loop breaks
         if (final_back & (new_cor < rho_threshold)) {
@@ -292,7 +292,7 @@ bvstep <- function(ref_mat,
         }
       }
 
-      if (back_deltarho > 0 | (final_back & (new_cor >= rho_threshold))) {
+      if (back_deltarho >= 0 | (final_back & (new_cor >= rho_threshold))) {
         nextstep <- 'back'
         current_cor <- new_cor
         current_set <- new_set
@@ -304,6 +304,7 @@ bvstep <- function(ref_mat,
                                                        species = paste0(new_set, collapse = ', ')))
       }
     }
+
   }
 
 
