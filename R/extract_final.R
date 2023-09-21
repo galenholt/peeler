@@ -20,7 +20,7 @@ extract_final <- function(bvout) {
     dplyr::mutate(species = alpha_sort_sp(.data$species)) |>
     dplyr::mutate(tiebreak = stats::runif(n = length(.data$species))) |>
     dplyr::arrange(.data$num_vars, dplyr::desc(.data$corr), .data$tiebreak) |>
-    dplyr::select(-.data$tiebreak)
+    dplyr::select(-"tiebreak")
 
   return(bv_final)
 }

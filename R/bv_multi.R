@@ -76,21 +76,21 @@ bv_multi <- function(ref_mat,
 
   # make a list of dataframes. allow parallelisation with furrr. Not sure it's worth it
 
-  if (rlang::is_installed('furrr')) {
-    bvlist <- furrr::future_map(1:num_restarts, \(i) bvstep(ref_mat = ref_mat,
-                                                            comp_mat = comp_mat,
-                                                            ref_dist = ref_dist,
-                                                            comp_dist = comp_dist,
-                                                            rand_start = rand_start,
-                                                            nrand = nrand,
-                                                            force_include = force_include,
-                                                            force_exclude = force_exclude,
-                                                            rho_threshold = rho_threshold,
-                                                            min_delta_rho = min_delta_rho,
-                                                            corr_method = corr_method,
-                                                            selection_ref = selection_ref),
-                                .options = furrr::furrr_options(seed = TRUE))
-  } else {
+  # if (rlang::is_installed('furrr')) {
+  #   bvlist <- furrr::future_map(1:num_restarts, \(i) bvstep(ref_mat = ref_mat,
+  #                                                           comp_mat = comp_mat,
+  #                                                           ref_dist = ref_dist,
+  #                                                           comp_dist = comp_dist,
+  #                                                           rand_start = rand_start,
+  #                                                           nrand = nrand,
+  #                                                           force_include = force_include,
+  #                                                           force_exclude = force_exclude,
+  #                                                           rho_threshold = rho_threshold,
+  #                                                           min_delta_rho = min_delta_rho,
+  #                                                           corr_method = corr_method,
+  #                                                           selection_ref = selection_ref),
+  #                               .options = furrr::furrr_options(seed = TRUE))
+  # } else {
 
     bvlist <- purrr::map(1:num_restarts, \(i) bvstep(ref_mat = ref_mat,
                                                      comp_mat = comp_mat,
@@ -104,7 +104,7 @@ bv_multi <- function(ref_mat,
                                                      min_delta_rho = min_delta_rho,
                                                      corr_method = corr_method,
                                                      selection_ref = selection_ref))
-  }
+  # }
 
   # Fix to choose smallest set given above threshold
   # AND- choose the LAST, nto the MAX, since it could have stepped back
@@ -157,7 +157,7 @@ bv_multi <- function(ref_mat,
     dplyr::ungroup()  |>
     dplyr::mutate(tiebreak = stats::runif(n = length(.data$species))) |>
     dplyr::arrange(.data$num_vars, dplyr::desc(.data$corr), .data$tiebreak) |>
-    dplyr::select(-.data$tiebreak, -.data$above_thresh)
+    dplyr::select(-"tiebreak", -"above_thresh")
 
   # Start counting ranks at max group of those above the threshold, but if there aren't any, start at 1
   if (nrow(ranked_best) > 0) {
@@ -174,7 +174,7 @@ bv_multi <- function(ref_mat,
     dplyr::ungroup()  |>
     dplyr::mutate(tiebreak = stats::runif(n = length(.data$species))) |>
     dplyr::arrange(dplyr::desc(.data$corr), .data$num_vars,.data$tiebreak) |>
-    dplyr::select(-.data$tiebreak, -.data$above_thresh)
+    dplyr::select(-"tiebreak", -"above_thresh")
 
   ranked_best <- dplyr::bind_rows(ranked_best, ranked_below)
 
@@ -183,7 +183,7 @@ bv_multi <- function(ref_mat,
                            ties.method = ties.method) <= num_best_results)
 
   best_set <- ranked_best[best_order, ] |>
-    dplyr::select(-.data$dc, -.data$rankgroup)
+    dplyr::select(-"dc", -"rankgroup")
 
   if (return_type == 'steps') {
     bvlist <- bvlist[best_set$random_start]

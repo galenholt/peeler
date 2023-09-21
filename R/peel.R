@@ -72,7 +72,7 @@ peel <- function(ref_mat,
   # The final result of the best peel, with a peel reference added
   peel_df <- bv_one |>
     dplyr::mutate(peel = 1) |>
-    dplyr::select(peel, dplyr::everything(), -.data$random_start)
+    dplyr::select(peel, dplyr::everything(), -"random_start")
 
   # The names in the best peel to remove
   prev_peel_names <- unique(c(force_exclude, extract_names(bv_one)))
@@ -108,7 +108,7 @@ peel <- function(ref_mat,
 
     final_one <- bv_one |>
       dplyr::mutate(peel = counter) |>
-      dplyr::select(peel, dplyr::everything(), -.data$random_start)
+      dplyr::select(peel, dplyr::everything(), -"random_start")
 
     peel_df <- dplyr::bind_rows(peel_df, final_one)
 
@@ -116,7 +116,7 @@ peel <- function(ref_mat,
 
     # use stopper to abort if the data is all unusable
     remnames <- colnames(comp_mat)[!colnames(comp_mat) %in% prev_peel_names]
-    if (all(colSums(comp_mat[,remnames] > 0) <= 1)) {
+    if (all(colSums(comp_mat[,remnames, drop = FALSE] > 0) <= 1)) {
       stopper <- TRUE
     }
 
