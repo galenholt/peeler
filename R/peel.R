@@ -79,6 +79,13 @@ peel <- function(ref_mat,
 
   # Start counter at 2 because we just did 1.
   counter <- 2
+
+  # use stopper to abort if the data is all unusable
+  remnames <- colnames(comp_mat)[!colnames(comp_mat) %in% prev_peel_names]
+  if (all(colSums(comp_mat[,remnames] > 0) <= 1)) {
+    stopper <- TRUE
+  }
+
   # Now keep peeling and removing species
   while ((length(prev_peel_names) <= length(colnames(comp_mat))) & !stopper) {
     bv_one <- bv_multi(ref_mat = ref_mat,
@@ -106,6 +113,12 @@ peel <- function(ref_mat,
     peel_df <- dplyr::bind_rows(peel_df, final_one)
 
     prev_peel_names <- c(prev_peel_names, extract_names(bv_one))
+
+    # use stopper to abort if the data is all unusable
+    remnames <- colnames(comp_mat)[!colnames(comp_mat) %in% prev_peel_names]
+    if (all(colSums(comp_mat[,remnames] > 0) <= 1)) {
+      stopper <- TRUE
+    }
 
     if (stop_type == 'all' &
         (length(prev_peel_names) == length(colnames(comp_mat)))) {
