@@ -30,6 +30,8 @@
 #'   'steps`
 #'  * `TRUE`: return a dataframe as in [bvstep()] with an additional column indicating which iterations are returned.
 #'  * `FALSE`: return a list, with each element a dataframe as returned by [bvstep()]
+#' @param parallel logical, default TRUE. Parallelise over num_restarts using [furrr::future_map()]. Need to have {furrr} installed and have set a [future::plan()]. See the help for {furrr} or {future}.
+#'
 #' @return dataframe (typically) or list (if `return_type == 'steps'` and
 #'   `returndf = FALSE`), of the best `num_best_results`, sorted by number of
 #'   species if correlation is over `rho_threshold`, and then highest
@@ -60,7 +62,8 @@ bv_multi <- function(ref_mat,
                      corr_method = 'kendall',
                      return_type = 'final',
                      returndf = TRUE,
-                     selection_ref = 'name') {
+                     selection_ref = 'name',
+                     parallel = TRUE) {
 
   # Sanity check the num_restarts
   if (!rand_start & num_restarts > 1) {
@@ -68,29 +71,35 @@ bv_multi <- function(ref_mat,
     num_restarts <- 1
   }
 
+
   # and the num_best_results
   if (num_best_results > num_restarts) {
     rlang::warn(glue::glue("Asking for {num_best_results}, but only running {num_restarts} times. Returning all results"))
     num_best_results <- length(best_order)
   }
 
+  if (parallel && !rlang::is_installed('furrr')) {
+    rlang::warn("parallel processing over num_restarts requires furrr. Please install it. Setting `parallel = FALSE` and proceeding")
+    parallel <- FALSE
+  }
+
   # make a list of dataframes. allow parallelisation with furrr. Not sure it's worth it
 
-  # if (rlang::is_installed('furrr')) {
-  #   bvlist <- furrr::future_map(1:num_restarts, \(i) bvstep(ref_mat = ref_mat,
-  #                                                           comp_mat = comp_mat,
-  #                                                           ref_dist = ref_dist,
-  #                                                           comp_dist = comp_dist,
-  #                                                           rand_start = rand_start,
-  #                                                           nrand = nrand,
-  #                                                           force_include = force_include,
-  #                                                           force_exclude = force_exclude,
-  #                                                           rho_threshold = rho_threshold,
-  #                                                           min_delta_rho = min_delta_rho,
-  #                                                           corr_method = corr_method,
-  #                                                           selection_ref = selection_ref),
-  #                               .options = furrr::furrr_options(seed = TRUE))
-  # } else {
+  if (parallel) {
+    bvlist <- furrr::future_map(1:num_restarts, \(i) bvstep(ref_mat = ref_mat,
+                                                            comp_mat = comp_mat,
+                                                            ref_dist = ref_dist,
+                                                            comp_dist = comp_dist,
+                                                            rand_start = rand_start,
+                                                            nrand = nrand,
+                                                            force_include = force_include,
+                                                            force_exclude = force_exclude,
+                                                            rho_threshold = rho_threshold,
+                                                            min_delta_rho = min_delta_rho,
+                                                            corr_method = corr_method,
+                                                            selection_ref = selection_ref),
+                                .options = furrr::furrr_options(seed = TRUE))
+  } else {
 
     bvlist <- purrr::map(1:num_restarts, \(i) bvstep(ref_mat = ref_mat,
                                                      comp_mat = comp_mat,
@@ -104,7 +113,7 @@ bv_multi <- function(ref_mat,
                                                      min_delta_rho = min_delta_rho,
                                                      corr_method = corr_method,
                                                      selection_ref = selection_ref))
-  # }
+  }
 
   # Fix to choose smallest set given above threshold
   # AND- choose the LAST, nto the MAX, since it could have stepped back
