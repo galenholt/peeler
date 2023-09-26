@@ -22,7 +22,8 @@ bv_multi(
   corr_method = "kendall",
   return_type = "final",
   returndf = TRUE,
-  selection_ref = "name"
+  selection_ref = "name",
+  parallel = TRUE
 )
 }
 \arguments{
@@ -81,6 +82,8 @@ boundary.}
 }}
 
 \item{selection_ref}{character, \code{'name'} (default)- return the variable names in each step. \code{'index'} returns their column index in \code{comp_mat}}
+
+\item{parallel}{logical, default TRUE. Parallelise over num_restarts using \code{\link[furrr:future_map]{furrr::future_map()}}. Need to have {furrr} installed and have set a \code{\link[future:plan]{future::plan()}}. See the help for {furrr} or {future}.}
 }
 \value{
 dataframe (typically) or list (if \code{return_type == 'steps'} and

@@ -289,6 +289,22 @@
       ],
       "Hash": "47b5f30c720c23999b913a1a635cf0bb"
     },
+    "furrr": {
+      "Package": "furrr",
+      "Version": "0.3.1",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Requirements": [
+        "R",
+        "future",
+        "globals",
+        "lifecycle",
+        "purrr",
+        "rlang",
+        "vctrs"
+      ],
+      "Hash": "da7a4c32196cb2262a41dd5a25d486ff"
+    },
     "future": {
       "Package": "future",
       "Version": "1.33.0",
