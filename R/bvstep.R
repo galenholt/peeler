@@ -58,7 +58,7 @@ bvstep <- function(ref_mat,
   rand_bypass <- FALSE
 
   # get the reference distance matrix
-  ref_dissim <- vegan::vegdist(ref_mat, method = ref_dist)
+  suppressWarnings(ref_dissim <- vegan::vegdist(ref_mat, method = ref_dist))
 
   # If no species are at multiple sites, everything falls over (distance matrices yield 1s and cor is NA)
   if (all(colSums(comp_mat > 0) == 1)) {
@@ -160,6 +160,8 @@ bvstep <- function(ref_mat,
 
   # Set up to track steps. We don't know how long this will be, unfortunately, so we'll have to build rowwise.
   counter <- 1
+  laststep <- "first"
+
   track_steps <- tibble::tibble(step = counter, FB = NA,
                                 num_vars = length(current_set),
                                 corr = current_cor, species = paste0(current_set, collapse = ', '))
@@ -182,6 +184,16 @@ bvstep <- function(ref_mat,
     # Do a forward step if we start with a single species, or if the backward selection has finished and set the nextstep flag to 'forward'
     if (length(current_set) == 1 | nextstep == 'forward') {
       steptype <- 'F'
+
+      # There's an edge case where all the species are used, we tried a backstep
+      # and it failed, and there's no species to add. So then the full set of
+      # species is the best we can do, and so just return it.
+      if (all(colnames(comp_mat) %in% current_set) & laststep == 'back') {
+        rlang::inform("All species used, cannot step forward and back makes things worse")
+        final_back <- TRUE # hacky break
+        break()
+      }
+
       # A forward step
       new_cor <- forward_step(comp_mat, initial_sp = current_set,
                               ref_distmat = ref_dissim,
@@ -201,6 +213,7 @@ bvstep <- function(ref_mat,
       # with one species, but there's actually a hidden pointless backstep in
       # there, and keeping that lets us keep the loops much cleaner
       nextstep <- 'back'
+      laststep <- 'forward'
 
 
 
@@ -239,6 +252,7 @@ bvstep <- function(ref_mat,
       if (!is.null(force_include) && all(current_set %in% force_include)) {
         rlang::warn("all possible species are in `force_include`, cannot take a backward step on iteration {counter}. Moving back to forward")
         nextstep <- 'forward'
+        laststep <- 'back'
         break()
       }
 
@@ -303,6 +317,7 @@ bvstep <- function(ref_mat,
                                                        corr = new_cor,
                                                        species = paste0(new_set, collapse = ', ')))
       }
+      laststep <- 'back'
     }
 
   }
@@ -317,6 +332,7 @@ bvstep <- function(ref_mat,
     track_steps <- track_steps |>
       dplyr::mutate(species = purrr::map_chr(.data$species, \(x) paste0(sort(strsplit(x, ', ')[[1]]), collapse = ', ')))
   }
+
   return(track_steps)
 }
 

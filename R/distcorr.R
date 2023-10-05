@@ -17,7 +17,7 @@ distcorr <- function(comp_mat, ref_distmat, comp_dist, corr_method) {
   # Kendall as per Clarke and Warwick 1998
   # use = na.or.complete to get values when there are NaN in the matrices, as
   # there often are especialy for single species.
-  correlation <- stats::cor(ref_distmat, comp_distmat,
-                     method = corr_method, use = 'na.or.complete')
+  correlation <- suppressWarnings(stats::cor(ref_distmat, comp_distmat,
+                     method = corr_method, use = 'na.or.complete'))
   return(correlation)
 }

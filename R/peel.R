@@ -32,7 +32,8 @@ peel <- function(ref_mat,
                  force_exclude = NULL,
                  rho_threshold = 0.95,
                  min_delta_rho = 0.001,
-                 corr_method = 'kendall') {
+                 corr_method = 'kendall',
+                 parallel = TRUE) {
 
   # deal with peel_stop
   stopper <- FALSE
@@ -43,8 +44,6 @@ peel <- function(ref_mat,
   if (peel_stop < 1 & peel_stop >= -1) {stop_type = 'rho'}
   # an iteration stop
   if (peel_stop >= 1 & !is.infinite(peel_stop)) {stop_type <- 'iteration'}
-
-
 
   # We have to do this with a for (or foreach would be nicer because we'd avoid
   # the initialization step but I don't want to add the dependency), not
@@ -67,7 +66,8 @@ peel <- function(ref_mat,
                      corr_method = corr_method,
                      return_type = 'final',
                      returndf = TRUE,
-                     selection_ref = 'name')
+                     selection_ref = 'name',
+                     parallel = parallel)
 
   # The final result of the best peel, with a peel reference added
   peel_df <- bv_one |>
@@ -104,7 +104,8 @@ peel <- function(ref_mat,
                        corr_method = corr_method,
                        return_type = 'final',
                        returndf = TRUE,
-                       selection_ref = 'name')
+                       selection_ref = 'name',
+                       parallel = parallel)
 
     final_one <- bv_one |>
       dplyr::mutate(peel = counter) |>

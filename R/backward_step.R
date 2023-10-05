@@ -18,6 +18,10 @@ backward_step <- function(remove_sp, comp_mat, initial_sp, ref_distmat, comp_dis
   all_cors <- sapply(remove_sp,
                      FUN = \(x) single_backward(x, comp_mat, initial_sp, ref_distmat, comp_dist, corr_method))
 
+  if (is.list(all_cors)) {
+    rlang::abort(glue::glue("`all_cors` is a list again, which will break downstream processing: {all_cors}"))
+  }
+
   # not max(abs(cors)) because we don't want the strongest relationship, we want
   # the closest resemblance to the full community, and so only want (+)
   best_cor <- all_cors[which(all_cors == max(all_cors, na.rm = TRUE))]
