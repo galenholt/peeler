@@ -18,7 +18,8 @@ peel(
   force_exclude = NULL,
   rho_threshold = 0.95,
   min_delta_rho = 0.001,
-  corr_method = "kendall"
+  corr_method = "kendall",
+  parallel = TRUE
 )
 }
 \arguments{
@@ -64,6 +65,8 @@ boundary.}
 \item{min_delta_rho}{Default 0.001. Cutoff to stop the process if rho is not increasing much.}
 
 \item{corr_method}{character, default \code{kendall}. This is the \code{method} argument of \code{\link[=cor]{cor()}}. Clarke and Warwick 1998 suggests kendall because we need a rank correlation and spearman doesn't handle ties.}
+
+\item{parallel}{logical, default TRUE. Parallelise over num_restarts using \code{\link[furrr:future_map]{furrr::future_map()}}. Need to have {furrr} installed and have set a \code{\link[future:plan]{future::plan()}}. See the help for {furrr} or {future}.}
 }
 \value{
 a tibble
