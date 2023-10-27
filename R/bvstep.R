@@ -91,7 +91,8 @@ bvstep <- function(ref_mat,
         rand_start_set <- sample(colnames(comp_mat), nrand)
         start_set <- unique(c(force_include, fixed_start, rand_start_set))
         check_mat <- comp_mat[,start_set, drop = FALSE]
-        no_multisite <- all(colSums(check_mat > 0) == 1)
+        # is each species present in at most one site (or not present at all?)
+        no_multisite <- all(colSums(check_mat > 0) <= 1)
 
         # helpful for debug.
         # if (no_multisite) {
@@ -118,7 +119,12 @@ bvstep <- function(ref_mat,
                              corr_method)
 
       if (is.na(current_cor)) {
-        rlang::abort("correlation between starting set and the reference are NA. Likely due to sparse data.")
+        rlang::abort(glue::glue("correlation between starting set and the reference are NA.
+                                Likely due to sparse data.
+                                Out of {ncol(check_mat)},
+                                {sum(colSums(check_mat) == 0)} species are not present in any samples,
+                                and {sum(colSums(check_mat > 0) == 1)} are present in 1 sample,
+                                leaving {sum(colSums(check_mat > 0) > 1)} species in > 1 sample"))
       }
 
       current_set <- colnames(check_mat)
