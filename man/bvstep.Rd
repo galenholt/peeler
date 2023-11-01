@@ -60,7 +60,9 @@ If we start with \code{rand_start} and \code{nrand} is more than 1, this starts 
 \examples{
 require(vegan)
 data(varespec)
-bvout <- bvstep(ref_mat = varespec, comp_mat = varespec,
-ref_dist = 'bray', comp_dist = 'bray',
-rand_start = TRUE, nrand = 5)
+bvout <- bvstep(
+  ref_mat = varespec, comp_mat = varespec,
+  ref_dist = "bray", comp_dist = "bray",
+  rand_start = TRUE, nrand = 5
+)
 }

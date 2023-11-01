@@ -102,8 +102,10 @@ e.g. \code{plan(multisession)} before running this code.
 \examples{
 require(vegan)
 data(varespec)
-bvout <- bv_multi(ref_mat = varespec, comp_mat = varespec,
-ref_dist = 'bray', comp_dist = 'bray',
-rand_start = TRUE, nrand = 5, num_restarts = 10)
+bvout <- bv_multi(
+  ref_mat = varespec, comp_mat = varespec,
+  ref_dist = "bray", comp_dist = "bray",
+  rand_start = TRUE, nrand = 5, num_restarts = 10
+)
 
 }

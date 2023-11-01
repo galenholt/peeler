@@ -13,10 +13,10 @@
 #' @export
 #'
 backward_step <- function(remove_sp, comp_mat, initial_sp, ref_distmat, comp_dist, corr_method) {
-
   # in a backwards step, we cut each of the initial species in turn
   all_cors <- sapply(remove_sp,
-                     FUN = \(x) single_backward(x, comp_mat, initial_sp, ref_distmat, comp_dist, corr_method))
+    FUN = \(x) single_backward(x, comp_mat, initial_sp, ref_distmat, comp_dist, corr_method)
+  )
 
   if (is.list(all_cors)) {
     rlang::abort(glue::glue("`all_cors` is a list again, which will break downstream processing: {all_cors}"))
@@ -27,8 +27,6 @@ backward_step <- function(remove_sp, comp_mat, initial_sp, ref_distmat, comp_dis
   best_cor <- all_cors[which(all_cors == max(all_cors, na.rm = TRUE))]
 
   return(best_cor)
-
-
 }
 
 
@@ -43,8 +41,7 @@ backward_step <- function(remove_sp, comp_mat, initial_sp, ref_distmat, comp_dis
 #' @export
 #'
 single_backward <- function(cut_sp, comp_mat, initial_sp, ref_distmat, comp_dist, corr_method) {
-
-  check_mat <- comp_mat[,initial_sp[!(initial_sp %in% cut_sp)], drop = FALSE]
+  check_mat <- comp_mat[, initial_sp[!(initial_sp %in% cut_sp)], drop = FALSE]
   correlation <- distcorr(check_mat, ref_distmat, comp_dist, corr_method)
   return(correlation)
 }

@@ -14,60 +14,71 @@
 #' @examples
 #' require(vegan)
 #' data(varespec)
-#' peels <- peel(ref_mat = varespec,
-#' comp_mat = varespec,
-#' nrand = 6,
-#' num_restarts = 10,
-#' corr_method = 'spearman')
+#' peels <- peel(
+#'   ref_mat = varespec,
+#'   comp_mat = varespec,
+#'   nrand = 6,
+#'   num_restarts = 10,
+#'   corr_method = "spearman"
+#' )
 peel <- function(ref_mat,
                  comp_mat,
-                 ref_dist = 'bray',
-                 comp_dist = 'bray',
-                 peel_stop = 'all',
+                 ref_dist = "bray",
+                 comp_dist = "bray",
+                 peel_stop = "all",
                  rand_start = TRUE,
-                 nrand = round(ncol(ref_mat)/10),
+                 nrand = round(ncol(ref_mat) / 10),
                  num_restarts = ifelse(rand_start, 5, 1),
-                 ties.method = 'random',
+                 ties.method = "random",
                  force_include = NULL,
                  force_exclude = NULL,
                  rho_threshold = 0.95,
                  min_delta_rho = 0.001,
-                 corr_method = 'kendall',
+                 corr_method = "kendall",
                  parallel = TRUE) {
-
   # deal with peel_stop
   stopper <- FALSE
   # peel the whole set
-  if (peel_stop == 'all') {peel_stop <- Inf}
-  if (is.infinite(peel_stop)) {stop_type <- 'all'}
+  if (peel_stop == "all") {
+    peel_stop <- Inf
+  }
+  if (is.infinite(peel_stop)) {
+    stop_type <- "all"
+  }
   # A rho stop will be between 0 and 1
-  if (peel_stop < 1 & peel_stop >= -1) {stop_type = 'rho'}
+  if (peel_stop < 1 & peel_stop >= -1) {
+    stop_type <- "rho"
+  }
   # an iteration stop
-  if (peel_stop >= 1 & !is.infinite(peel_stop)) {stop_type <- 'iteration'}
+  if (peel_stop >= 1 & !is.infinite(peel_stop)) {
+    stop_type <- "iteration"
+  }
 
   # We have to do this with a for (or foreach would be nicer because we'd avoid
   # the initialization step but I don't want to add the dependency), not
   # furrr/purrr/apply
 
   # Get the first peel to initialise all the outputs
-  bv_one <- bv_multi(ref_mat = ref_mat,
-                     comp_mat = comp_mat,
-                     ref_dist = ref_dist,
-                     comp_dist = comp_dist,
-                     rand_start = rand_start,
-                     nrand = min(c(nrand, ncol(comp_mat))),
-                     num_restarts = num_restarts,
-                     num_best_results = 1,
-                     ties.method = ties.method,
-                     force_include = force_include,
-                     force_exclude = force_exclude,
-                     rho_threshold = rho_threshold,
-                     min_delta_rho = min_delta_rho,
-                     corr_method = corr_method,
-                     return_type = 'final',
-                     returndf = TRUE,
-                     selection_ref = 'name',
-                     parallel = parallel)
+  bv_one <- bv_multi(
+    ref_mat = ref_mat,
+    comp_mat = comp_mat,
+    ref_dist = ref_dist,
+    comp_dist = comp_dist,
+    rand_start = rand_start,
+    nrand = min(c(nrand, ncol(comp_mat))),
+    num_restarts = num_restarts,
+    num_best_results = 1,
+    ties.method = ties.method,
+    force_include = force_include,
+    force_exclude = force_exclude,
+    rho_threshold = rho_threshold,
+    min_delta_rho = min_delta_rho,
+    corr_method = corr_method,
+    return_type = "final",
+    returndf = TRUE,
+    selection_ref = "name",
+    parallel = parallel
+  )
 
   # The final result of the best peel, with a peel reference added
   peel_df <- bv_one |>
@@ -82,30 +93,32 @@ peel <- function(ref_mat,
 
   # use stopper to abort if the data is all unusable
   remnames <- colnames(comp_mat)[!colnames(comp_mat) %in% prev_peel_names]
-  if (all(colSums(comp_mat[,remnames] > 0) <= 1)) {
+  if (all(colSums(comp_mat[, remnames] > 0) <= 1)) {
     stopper <- TRUE
   }
 
   # Now keep peeling and removing species
   while ((length(prev_peel_names) <= length(colnames(comp_mat))) & !stopper) {
-    bv_one <- bv_multi(ref_mat = ref_mat,
-                       comp_mat = comp_mat,
-                       ref_dist = ref_dist,
-                       comp_dist = comp_dist,
-                       rand_start = rand_start,
-                       nrand = min(c(nrand, ncol(comp_mat)-length(prev_peel_names))),
-                       num_restarts = num_restarts,
-                       num_best_results = 1,
-                       ties.method = ties.method,
-                       force_include = force_include,
-                       force_exclude = prev_peel_names,
-                       rho_threshold = rho_threshold,
-                       min_delta_rho = min_delta_rho,
-                       corr_method = corr_method,
-                       return_type = 'final',
-                       returndf = TRUE,
-                       selection_ref = 'name',
-                       parallel = parallel)
+    bv_one <- bv_multi(
+      ref_mat = ref_mat,
+      comp_mat = comp_mat,
+      ref_dist = ref_dist,
+      comp_dist = comp_dist,
+      rand_start = rand_start,
+      nrand = min(c(nrand, ncol(comp_mat) - length(prev_peel_names))),
+      num_restarts = num_restarts,
+      num_best_results = 1,
+      ties.method = ties.method,
+      force_include = force_include,
+      force_exclude = prev_peel_names,
+      rho_threshold = rho_threshold,
+      min_delta_rho = min_delta_rho,
+      corr_method = corr_method,
+      return_type = "final",
+      returndf = TRUE,
+      selection_ref = "name",
+      parallel = parallel
+    )
 
     final_one <- bv_one |>
       dplyr::mutate(peel = counter) |>
@@ -117,21 +130,23 @@ peel <- function(ref_mat,
 
     # use stopper to abort if the data is all unusable
     remnames <- colnames(comp_mat)[!colnames(comp_mat) %in% prev_peel_names]
-    if (all(colSums(comp_mat[,remnames, drop = FALSE] > 0) <= 1)) {
+    if (all(colSums(comp_mat[, remnames, drop = FALSE] > 0) <= 1)) {
       stopper <- TRUE
     }
 
-    if (stop_type == 'all' &
-        (length(prev_peel_names) == length(colnames(comp_mat)))) {
+    if (stop_type == "all" &
+      (length(prev_peel_names) == length(colnames(comp_mat)))) {
       stopper <- TRUE
     }
-    if (stop_type == 'rho' & final_one$corr <= peel_stop) {stopper <- TRUE}
-    if (stop_type == 'iteration' & counter == peel_stop) {stopper <- TRUE}
+    if (stop_type == "rho" & final_one$corr <= peel_stop) {
+      stopper <- TRUE
+    }
+    if (stop_type == "iteration" & counter == peel_stop) {
+      stopper <- TRUE
+    }
 
     counter <- counter + 1
-
   }
 
   return(peel_df)
-
 }

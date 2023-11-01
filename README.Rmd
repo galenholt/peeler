@@ -44,9 +44,11 @@ data(varespec)
 You can use `bvstep` alone for a single realisation.
 
 ```{r}
-bvout <- bvstep(ref_mat = varespec, comp_mat = varespec,
-                   ref_dist = 'bray', comp_dist = 'bray',
-                   rand_start = TRUE, nrand = 5)
+bvout <- bvstep(
+  ref_mat = varespec, comp_mat = varespec,
+  ref_dist = "bray", comp_dist = "bray",
+  rand_start = TRUE, nrand = 5
+)
 bvout
 ```
 
@@ -55,33 +57,39 @@ bvout
 The `bv_multi` function runs bvstep for a number of random starts to avoid local optima, here with 5 species to start, iterated 10 times. We can set the `num_best_results` to set how many results to return. Here, 'best' above `rho_threshold` is determined first by minimum species and then correlation, while below `rho_threshold` it is determined first by correlation and then number of species. This is in keeping with the idea of finding the fewest species to meet the threshold. To return all steps, simply set `num_best_results` to the same value as `num_restarts`.
 
 ```{r}
-bv_m <- bv_multi(ref_mat = varespec, comp_mat = varespec,
-                   ref_dist = 'bray', comp_dist = 'bray',
-                 rho_threshold = 0.95,
-                 return_type = 'final',
-                   rand_start = TRUE, nrand = 5, num_restarts = 10)
+bv_m <- bv_multi(
+  ref_mat = varespec, comp_mat = varespec,
+  ref_dist = "bray", comp_dist = "bray",
+  rho_threshold = 0.95,
+  return_type = "final",
+  rand_start = TRUE, nrand = 5, num_restarts = 10
+)
 bv_m
 ```
 
 The default `return_type = 'final'` gives the best outcome of each random start, for the best `num_best_results`. If we want the full steps of each of the `num_random_starts`, set `return_type = 'steps'`. This can also be returned as a list, if `returndf = FALSE`.
 
 ```{r}
-bv_steps <- bv_multi(ref_mat = varespec, comp_mat = varespec,
-                   ref_dist = 'bray', comp_dist = 'bray',
-                 rho_threshold = 0.95,
-                 return_type = 'steps',
-                   rand_start = TRUE, nrand = 5, num_restarts = 10)
+bv_steps <- bv_multi(
+  ref_mat = varespec, comp_mat = varespec,
+  ref_dist = "bray", comp_dist = "bray",
+  rho_threshold = 0.95,
+  return_type = "steps",
+  rand_start = TRUE, nrand = 5, num_restarts = 10
+)
 bv_steps
 ```
 
 With `return_type = 'unique'`, we return the best `num_best_results` from all steps in all random starts. The first line of this should match the first line of `return_type = 'final'`, since that is the best result overall. After that, they may differ as the penultimate set from a particular random start might be better than the final of some others.
 
 ```{r}
-bv_unique <- bv_multi(ref_mat = varespec, comp_mat = varespec,
-                   ref_dist = 'bray', comp_dist = 'bray',
-                 rho_threshold = 0.95,
-                 return_type = 'unique',
-                   rand_start = TRUE, nrand = 5, num_restarts = 10)
+bv_unique <- bv_multi(
+  ref_mat = varespec, comp_mat = varespec,
+  ref_dist = "bray", comp_dist = "bray",
+  rho_threshold = 0.95,
+  return_type = "unique",
+  rand_start = TRUE, nrand = 5, num_restarts = 10
+)
 bv_unique
 ```
 
@@ -89,11 +97,13 @@ bv_unique
 
 The `peel` function runs `bv_multi` iteratively, removing the best set each time.
 ```{r}
-peels <- peel(ref_mat = varespec,
-                comp_mat = varespec,
-                nrand = 6,
-                num_restarts = 10,
-                corr_method = 'spearman')
+peels <- peel(
+  ref_mat = varespec,
+  comp_mat = varespec,
+  nrand = 6,
+  num_restarts = 10,
+  corr_method = "spearman"
+)
 peels
 ```
 
@@ -102,7 +112,7 @@ There are a number of user-defineable options in each of those functions, see th
 THere are also two potentially useful helper functions, `extract_final`, which gets the last step in `bvstep` output, and `extract_names`. The `bvstep` output has names in a single string with comma-separated species names, and we often want them as a character vector. The `extract_names` function parses this.
 
 ```{r}
-best_bv <- extract_names(bvout, step = 'last')
+best_bv <- extract_names(bvout, step = "last")
 best_bv
 ```
 

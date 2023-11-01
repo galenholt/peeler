@@ -14,7 +14,8 @@ forward_step <- function(comp_mat, initial_sp, ref_distmat, comp_dist, corr_meth
   names_to_loop <- colnames(comp_mat)[!(colnames(comp_mat) %in% initial_sp)]
 
   all_cors <- sapply(names_to_loop,
-                     FUN = \(x) single_forward(x, comp_mat, initial_sp, ref_distmat, comp_dist, corr_method))
+    FUN = \(x) single_forward(x, comp_mat, initial_sp, ref_distmat, comp_dist, corr_method)
+  )
 
   if (is.list(all_cors)) {
     rlang::abort(glue::glue("`all_cors` is a list again, which will break downstream processing: {all_cors}"))
@@ -23,8 +24,6 @@ forward_step <- function(comp_mat, initial_sp, ref_distmat, comp_dist, corr_meth
   best_cor <- all_cors[which(all_cors == max(all_cors, na.rm = TRUE))]
 
   return(best_cor)
-
-
 }
 
 
@@ -39,7 +38,7 @@ forward_step <- function(comp_mat, initial_sp, ref_distmat, comp_dist, corr_meth
 #' @export
 #'
 single_forward <- function(add_sp, comp_mat, initial_sp, ref_distmat, comp_dist, corr_method) {
-  check_mat <- comp_mat[,c(initial_sp, add_sp), drop = FALSE]
+  check_mat <- comp_mat[, c(initial_sp, add_sp), drop = FALSE]
   correlation <- distcorr(check_mat, ref_distmat, comp_dist, corr_method)
   return(correlation)
 }

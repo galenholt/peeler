@@ -42,29 +42,30 @@
 #' @examples
 #' require(vegan)
 #' data(varespec)
-#' bvout <- bv_multi(ref_mat = varespec, comp_mat = varespec,
-#' ref_dist = 'bray', comp_dist = 'bray',
-#' rand_start = TRUE, nrand = 5, num_restarts = 10)
+#' bvout <- bv_multi(
+#'   ref_mat = varespec, comp_mat = varespec,
+#'   ref_dist = "bray", comp_dist = "bray",
+#'   rand_start = TRUE, nrand = 5, num_restarts = 10
+#' )
 #'
 bv_multi <- function(ref_mat,
                      comp_mat,
-                     ref_dist = 'bray',
-                     comp_dist = 'bray',
+                     ref_dist = "bray",
+                     comp_dist = "bray",
                      rand_start = TRUE,
-                     nrand = round(ncol(ref_mat)/10),
+                     nrand = round(ncol(ref_mat) / 10),
                      num_restarts = ifelse(rand_start, 5, 1),
                      num_best_results = min(c(5, num_restarts)),
-                     ties.method = 'random',
+                     ties.method = "random",
                      force_include = NULL,
                      force_exclude = NULL,
                      rho_threshold = 0.95,
                      min_delta_rho = 0.001,
-                     corr_method = 'kendall',
-                     return_type = 'final',
+                     corr_method = "kendall",
+                     return_type = "final",
                      returndf = TRUE,
-                     selection_ref = 'name',
+                     selection_ref = "name",
                      parallel = TRUE) {
-
   # Sanity check the num_restarts
   if (!rand_start & num_restarts > 1) {
     rlang::warn("no reason to restart if no random starts. setting num_restarts to 1")
@@ -78,7 +79,7 @@ bv_multi <- function(ref_mat,
     num_best_results <- length(best_order)
   }
 
-  if (parallel && !rlang::is_installed('furrr')) {
+  if (parallel && !rlang::is_installed("furrr")) {
     rlang::warn("parallel processing over num_restarts requires furrr. Please install it. Setting `parallel = FALSE` and proceeding")
     parallel <- FALSE
   }
@@ -86,33 +87,37 @@ bv_multi <- function(ref_mat,
   # make a list of dataframes. allow parallelisation with furrr. Not sure it's worth it
 
   if (parallel) {
-    bvlist <- furrr::future_map(1:num_restarts, \(i) bvstep(ref_mat = ref_mat,
-                                                            comp_mat = comp_mat,
-                                                            ref_dist = ref_dist,
-                                                            comp_dist = comp_dist,
-                                                            rand_start = rand_start,
-                                                            nrand = nrand,
-                                                            force_include = force_include,
-                                                            force_exclude = force_exclude,
-                                                            rho_threshold = rho_threshold,
-                                                            min_delta_rho = min_delta_rho,
-                                                            corr_method = corr_method,
-                                                            selection_ref = selection_ref),
-                                .options = furrr::furrr_options(seed = TRUE))
+    bvlist <- furrr::future_map(1:num_restarts, \(i) bvstep(
+      ref_mat = ref_mat,
+      comp_mat = comp_mat,
+      ref_dist = ref_dist,
+      comp_dist = comp_dist,
+      rand_start = rand_start,
+      nrand = nrand,
+      force_include = force_include,
+      force_exclude = force_exclude,
+      rho_threshold = rho_threshold,
+      min_delta_rho = min_delta_rho,
+      corr_method = corr_method,
+      selection_ref = selection_ref
+    ),
+    .options = furrr::furrr_options(seed = TRUE)
+    )
   } else {
-
-    bvlist <- purrr::map(1:num_restarts, \(i) bvstep(ref_mat = ref_mat,
-                                                     comp_mat = comp_mat,
-                                                     ref_dist = ref_dist,
-                                                     comp_dist = comp_dist,
-                                                     rand_start = rand_start,
-                                                     nrand = nrand,
-                                                     force_include = force_include,
-                                                     force_exclude = force_exclude,
-                                                     rho_threshold = rho_threshold,
-                                                     min_delta_rho = min_delta_rho,
-                                                     corr_method = corr_method,
-                                                     selection_ref = selection_ref))
+    bvlist <- purrr::map(1:num_restarts, \(i) bvstep(
+      ref_mat = ref_mat,
+      comp_mat = comp_mat,
+      ref_dist = ref_dist,
+      comp_dist = comp_dist,
+      rand_start = rand_start,
+      nrand = nrand,
+      force_include = force_include,
+      force_exclude = force_exclude,
+      rho_threshold = rho_threshold,
+      min_delta_rho = min_delta_rho,
+      corr_method = corr_method,
+      selection_ref = selection_ref
+    ))
   }
 
   # Fix to choose smallest set given above threshold
@@ -123,7 +128,7 @@ bv_multi <- function(ref_mat,
 
   # Get the final result from each iteration (usually)
   # These come in sorted
-  if (return_type %in% c('final', 'steps')) {
+  if (return_type %in% c("final", "steps")) {
     to_rank <- extract_final(bvlist)
   }
 
@@ -134,14 +139,14 @@ bv_multi <- function(ref_mat,
   # Limiting this to just above rho_threshold, or if none are, the single best.
   # This could be an issue for late peels, but otherwise it's a pain to do
   # conditional sorts
-  if (return_type %in% c('unique')) {
+  if (return_type %in% c("unique")) {
     to_rank <- dplyr::bind_rows(bvlist, .id = "random_start")
 
     if (max(to_rank$corr, na.rm = TRUE) >= rho_threshold) {
       to_rank <- to_rank |>
         dplyr::filter(.data$corr > rho_threshold)
     } else {
-      to_rank <- to_rank|>
+      to_rank <- to_rank |>
         dplyr::filter(.data$corr == max(.data$corr, na.rm = TRUE))
     }
   }
@@ -161,9 +166,11 @@ bv_multi <- function(ref_mat,
 
   ranked_best <- to_rank_above |>
     dplyr::group_by(.data$num_vars, dc = dplyr::desc(.data$corr)) |>
-    dplyr::mutate(rankgroup = dplyr::cur_group_id(),
-                  num_tied_with = dplyr::n()) |>
-    dplyr::ungroup()  |>
+    dplyr::mutate(
+      rankgroup = dplyr::cur_group_id(),
+      num_tied_with = dplyr::n()
+    ) |>
+    dplyr::ungroup() |>
     dplyr::mutate(tiebreak = stats::runif(n = length(.data$species))) |>
     dplyr::arrange(.data$num_vars, dplyr::desc(.data$corr), .data$tiebreak) |>
     dplyr::select(-"tiebreak", -"above_thresh")
@@ -178,23 +185,26 @@ bv_multi <- function(ref_mat,
   # Rank those below the threshold by correlation and then number of species.
   ranked_below <- to_rank_below |>
     dplyr::group_by(dc = dplyr::desc(.data$corr), .data$num_vars) |>
-    dplyr::mutate(rankgroup = rankstart + dplyr::cur_group_id(),
-                  num_tied_with = dplyr::n()) |>
-    dplyr::ungroup()  |>
+    dplyr::mutate(
+      rankgroup = rankstart + dplyr::cur_group_id(),
+      num_tied_with = dplyr::n()
+    ) |>
+    dplyr::ungroup() |>
     dplyr::mutate(tiebreak = stats::runif(n = length(.data$species))) |>
-    dplyr::arrange(dplyr::desc(.data$corr), .data$num_vars,.data$tiebreak) |>
+    dplyr::arrange(dplyr::desc(.data$corr), .data$num_vars, .data$tiebreak) |>
     dplyr::select(-"tiebreak", -"above_thresh")
 
   ranked_best <- dplyr::bind_rows(ranked_best, ranked_below)
 
- # use `rank` to get the row indices with ties.method
+  # use `rank` to get the row indices with ties.method
   best_order <- which(rank(ranked_best$rankgroup,
-                           ties.method = ties.method) <= num_best_results)
+    ties.method = ties.method
+  ) <= num_best_results)
 
   best_set <- ranked_best[best_order, ] |>
     dplyr::select(-"dc", -"rankgroup")
 
-  if (return_type == 'steps') {
+  if (return_type == "steps") {
     bvlist <- bvlist[best_set$random_start]
     if (returndf) {
       return(dplyr::bind_rows(bvlist, .id = "random_start"))
@@ -203,13 +213,7 @@ bv_multi <- function(ref_mat,
     }
   }
 
-  if (return_type %in% c('final', 'unique')) {
+  if (return_type %in% c("final", "unique")) {
     return(best_set)
   }
-
-
-
-
 }
-
-

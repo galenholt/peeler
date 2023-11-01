@@ -1,5 +1,5 @@
 count_sp <- function(x) {
-  purrr::map_int(stringr::str_split(x, ', '), length)
+  purrr::map_int(stringr::str_split(x, ", "), length)
 }
 
 count_test <- function(df) {

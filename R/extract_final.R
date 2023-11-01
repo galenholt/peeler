@@ -7,7 +7,7 @@
 #'
 extract_final <- function(bvout) {
   # if not a dataframe, make it one
-  if (!inherits(bvout, 'data.frame')) {
+  if (!inherits(bvout, "data.frame")) {
     bvout <- dplyr::bind_rows(bvout, .id = "random_start")
   }
 
@@ -31,5 +31,5 @@ extract_final <- function(bvout) {
 #'
 #' @return list of strings
 alpha_sort_sp <- function(x) {
-    purrr::map_chr(x, stringr::str_sort)
+  purrr::map_chr(x, stringr::str_sort)
 }
