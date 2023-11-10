@@ -11,7 +11,7 @@ bv_multi(
   ref_dist = "bray",
   comp_dist = "bray",
   rand_start = TRUE,
-  nrand = round(ncol(ref_mat)/10),
+  nrand = max(1, round(ncol(ref_mat)/10)),
   num_restarts = ifelse(rand_start, 5, 1),
   num_best_results = min(c(5, num_restarts)),
   ties.method = "random",

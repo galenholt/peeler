@@ -35,7 +35,7 @@ bvstep <- function(ref_mat,
                    ref_dist = "bray",
                    comp_dist = "bray",
                    rand_start = TRUE,
-                   nrand = round(ncol(ref_mat) / 10),
+                   nrand = max(1, round(ncol(ref_mat) / 10)),
                    fixed_start = NULL,
                    force_include = NULL,
                    force_exclude = NULL,
@@ -54,6 +54,16 @@ bvstep <- function(ref_mat,
   # If forcing exclusions, just clip comp_mat at the beginning
   if (!is.null(force_exclude)) {
     comp_mat <- comp_mat[, which(!(colnames(comp_mat) %in% force_exclude)), drop = FALSE]
+  }
+
+  # catch a situation with no columns
+  if (nrand == 0 & is.null(fixed_start) & is.null(force_include)) {
+    rlang::abort(glue::glue("No columns in starting set.
+                            nrand is {nrand},
+                            fixed_start is {fixed_start},
+                            and force_include is {force_include}.",
+      .transformer = null_transformer("{NULL}")
+    ))
   }
 
   # flag to bypass random starts if not possible
@@ -193,7 +203,6 @@ bvstep <- function(ref_mat,
 
   # Now we need the logic for continuing, and inside that, the forward/backward logic
   while (current_cor < rho_threshold & deltarho > min_delta_rho & !final_back) {
-
     # Do a forward step if we start with a single species, or if the backward selection has finished and set the nextstep flag to 'forward'
     if (length(current_set) == 1 | nextstep == "forward") {
       steptype <- "F"
@@ -267,9 +276,8 @@ bvstep <- function(ref_mat,
           # the *best*
 
           current_cor <- max(track_steps$corr, na.rm = TRUE)
-          nextstep <- 'forward'
+          nextstep <- "forward"
         }
-
       }
 
       # If we cross rho_threshold on a forward, allow a backstep the chance to

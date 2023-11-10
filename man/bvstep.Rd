@@ -10,7 +10,7 @@ bvstep(
   ref_dist = "bray",
   comp_dist = "bray",
   rand_start = TRUE,
-  nrand = round(ncol(ref_mat)/10),
+  nrand = max(1, round(ncol(ref_mat)/10)),
   fixed_start = NULL,
   force_include = NULL,
   force_exclude = NULL,
