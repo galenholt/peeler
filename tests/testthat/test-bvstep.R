@@ -62,3 +62,39 @@ test_that("best start works", {
   expect_true(count_test(bvout))
 })
 # Need to test a force_include with all species and see if it goes infinite
+
+test_that("Ensure success with -Inf", {
+  set.seed(17)
+  # a <- .Random.seed
+  # This never actually goes negative, need a different test dataset
+  bvout <- bvstep(
+    ref_mat = varespec, comp_mat = varespec,
+    ref_dist = "bray", comp_dist = "bray",
+    rand_start = TRUE, nrand = 5,
+    rho_threshold = 1,
+    min_delta_rho = -Inf
+  )
+  expect_s3_class(bvout, "data.frame")
+  expect_equal(nrow(bvout), 49)
+  expect_equal(max(bvout$corr, na.rm = TRUE), 1)
+  expect_equal(names(bvout), c("step", "FB", "num_vars", "corr", "species"))
+  expect_true(count_test(bvout))
+})
+
+test_that("Use up all species before reaching rho", {
+  set.seed(17)
+  # a <- .Random.seed
+  # This never actually goes negative, need a different test dataset
+  bvout <- bvstep(
+    ref_mat = varespec,
+    comp_mat = varespec[, sample(30)],
+    ref_dist = "bray", comp_dist = "bray",
+    rand_start = TRUE, nrand = 5,
+    rho_threshold = 1,
+    min_delta_rho = -Inf
+  )
+  expect_s3_class(bvout, "data.frame")
+  expect_equal(nrow(bvout), 30)
+  expect_equal(names(bvout), c("step", "FB", "num_vars", "corr", "species"))
+  expect_true(count_test(bvout))
+})

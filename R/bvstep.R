@@ -15,6 +15,7 @@
 #' @param force_exclude `NULL` (default) or character of columns to always exclude- these are just dropped right at the start.
 #' @param rho_threshold Default 0.95. Threshold at which to cut off the process. If this is crossed at a forward step, one last backward step is taken to check if a smaller set still meets the condition.
 #' @param min_delta_rho Default 0.001. Cutoff to stop the process if rho is not increasing much.
+#'  * Use `-Inf` If you want to ensure the algorithm finds something greater than rho_threshold (or as high as possible if rho_threshold is never met), even if it means using all the data. Any negative value allows strings of worsening results followed by increases to get out of local minima
 #' @param corr_method character, default `kendall`. This is the `method` argument of [cor()]. Clarke and Warwick 1998 suggests kendall because we need a rank correlation and spearman doesn't handle ties.
 #' @param selection_ref character, `'name'` (default)- return the variable names in each step. `'index'` returns their column index in `comp_mat`
 #'
@@ -178,8 +179,8 @@ bvstep <- function(ref_mat,
     corr = current_cor, species = paste0(current_set, collapse = ", ")
   )
 
-  # To start, give it a deltarho > minimum
-  deltarho <- min_delta_rho + 1
+  # To start, give it a deltarho > minimum (always will be if > 1, but really be sure with Inf)
+  deltarho <- Inf
   # set the final_back flag to FALSE- this gives the backstep one more chance
   # after forward crosses the rho_threshold
   final_back <- FALSE
@@ -192,14 +193,17 @@ bvstep <- function(ref_mat,
 
   # Now we need the logic for continuing, and inside that, the forward/backward logic
   while (current_cor < rho_threshold & deltarho > min_delta_rho & !final_back) {
+
     # Do a forward step if we start with a single species, or if the backward selection has finished and set the nextstep flag to 'forward'
     if (length(current_set) == 1 | nextstep == "forward") {
       steptype <- "F"
 
       # There's an edge case where all the species are used, we tried a backstep
       # and it failed, and there's no species to add. So then the full set of
-      # species is the best we can do, and so just return it.
-      if (all(colnames(comp_mat) %in% current_set) & laststep == "back") {
+      # species is the best we can do, and so just return it. Similarly, if
+      # deltarho is < 0, we've been sent for a second forward because back will
+      # be worse, and if we can't go forward, need to break.
+      if (all(colnames(comp_mat) %in% current_set) & (laststep == "back" | deltarho < 0)) {
         rlang::inform("All species used, cannot step forward and back makes things worse")
         final_back <- TRUE # hacky break
         break()
@@ -222,7 +226,8 @@ bvstep <- function(ref_mat,
 
       new_set <- c(current_set, names(new_cor))
 
-      # forward only ever happens once. It effectively happens twice when we start
+      # forward typically only happens once (except in the edge case of negative
+      # deltarhos and min_delta_rho, handled in the next if). It effectively happens twice when we start
       # with one species, but there's actually a hidden pointless backstep in
       # there, and keeping that lets us keep the loops much cleaner
       nextstep <- "back"
@@ -235,7 +240,7 @@ bvstep <- function(ref_mat,
 
       # Annoying to have the counter iterator inside the if, but we need to not
       # step it or save the output of this loop if delta_rho is too small here
-      if (deltarho > min_delta_rho) {
+      if (deltarho >= min_delta_rho) {
         # calculate change and set the rho tracking
         current_cor <- new_cor
         current_set <- new_set
@@ -249,6 +254,22 @@ bvstep <- function(ref_mat,
             species = paste0(new_set, collapse = ", ")
           )
         )
+
+        # Handle the edge case with negative deltarho and more-negative
+        # min_delta_rho- send it back around for another forward even if
+        # negative. Otherwise get stuck in infinite loop
+        if (deltarho <= 0) {
+          # It's possible the deltarhos continue negative, putting us in an
+          # infinite loop if we only look for improvement from the preceding
+          # iteration (e.g. get worse for three steps, a bit better for one but
+          # still not as good as the initial, then worse again and repeat). So,
+          # short-circuit that by keeping adding until we get improvement from
+          # the *best*
+
+          current_cor <- max(track_steps$corr, na.rm = TRUE)
+          nextstep <- 'forward'
+        }
+
       }
 
       # If we cross rho_threshold on a forward, allow a backstep the chance to

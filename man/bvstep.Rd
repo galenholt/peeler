@@ -45,7 +45,10 @@ bvstep(
 
 \item{rho_threshold}{Default 0.95. Threshold at which to cut off the process. If this is crossed at a forward step, one last backward step is taken to check if a smaller set still meets the condition.}
 
-\item{min_delta_rho}{Default 0.001. Cutoff to stop the process if rho is not increasing much.}
+\item{min_delta_rho}{Default 0.001. Cutoff to stop the process if rho is not increasing much.
+\itemize{
+\item Use \code{-Inf} If you want to ensure the algorithm finds something greater than rho_threshold (or as high as possible if rho_threshold is never met), even if it means using all the data. Any negative value allows strings of worsening results followed by increases to get out of local minima
+}}
 
 \item{corr_method}{character, default \code{kendall}. This is the \code{method} argument of \code{\link[=cor]{cor()}}. Clarke and Warwick 1998 suggests kendall because we need a rank correlation and spearman doesn't handle ties.}
 
