@@ -59,6 +59,7 @@ bvstep <- function(ref_mat,
   # catch a situation with no columns
   if (nrand == 0 & is.null(fixed_start) & is.null(force_include)) {
     rlang::abort(glue::glue("No columns in starting set.
+                            data has {ncol(comp_mat)} columns.
                             nrand is {nrand},
                             fixed_start is {fixed_start},
                             and force_include is {force_include}.",
