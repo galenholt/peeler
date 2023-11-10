@@ -84,7 +84,6 @@ test_that("Ensure success with -Inf", {
 test_that("Use up all species before reaching rho", {
   set.seed(17)
   # a <- .Random.seed
-  # This never actually goes negative, need a different test dataset
   bvout <- bvstep(
     ref_mat = varespec,
     comp_mat = varespec[, sample(30)],
@@ -97,4 +96,35 @@ test_that("Use up all species before reaching rho", {
   expect_equal(nrow(bvout), 30)
   expect_equal(names(bvout), c("step", "FB", "num_vars", "corr", "species"))
   expect_true(count_test(bvout))
+})
+
+test_that("works for default nrand that would round to 0", {
+  set.seed(17)
+  # a <- .Random.seed Because nrand defaults to round(ncol/10), it goes to 0 for
+  # ncol <= 5, and have to catch it with a single. The default should prevent
+  # that
+  bvout <- bvstep(
+    ref_mat = varespec[, sample(4)],
+    comp_mat = varespec[, sample(4)],
+    ref_dist = "bray", comp_dist = "bray",
+    rand_start = TRUE,
+    rho_threshold = 1,
+    min_delta_rho = -Inf
+  )
+
+  expect_s3_class(bvout, "data.frame")
+  expect_equal(nrow(bvout), 4)
+
+  # if we set nrand to 0, it should error
+  expect_error(bvout <- bvstep(
+    ref_mat = varespec[, sample(4)],
+    comp_mat = varespec[, sample(4)],
+    nrand = 0,
+    ref_dist = "bray", comp_dist = "bray",
+    rand_start = TRUE,
+    rho_threshold = 1,
+    min_delta_rho = -Inf)
+  )
+
+
 })

@@ -49,8 +49,25 @@ bvout <- bvstep(
   ref_dist = "bray", comp_dist = "bray",
   rand_start = TRUE, nrand = 5
 )
+
 bvout
 ```
+
+While it is always possible to get a correlation of 1 when `ref_mat` and `comp_mat` are the same, it is sometimes the case that local optima will cause the algorithm to cut off before `rho_threshold` is reached. If you want to *always* get at least one result, use a negative `min_delta_rho` (ideally `min_delta_rho = -Inf`). We force it to happen here by setting rho to 1.
+
+```{r}
+bvout_force <- bvstep(
+  ref_mat = varespec, comp_mat = varespec,
+  ref_dist = "bray", comp_dist = "bray",
+  rand_start = TRUE, nrand = 5,
+  rho_threshold = 1,
+  min_delta_rho = -Inf
+)
+
+bvout_force
+```
+
+If the two matrices are not identical (e.g. species and environment), this will keep adding columns until either `rho_threshold` is met or they are all included. Note that in this case, it is not guaranteed that this is the highest correlation possible when the two matrices differ.
 
 ## Random starts to explore the space
 
@@ -64,6 +81,7 @@ bv_m <- bv_multi(
   return_type = "final",
   rand_start = TRUE, nrand = 5, num_restarts = 10
 )
+
 bv_m
 ```
 
