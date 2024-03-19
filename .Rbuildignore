@@ -7,3 +7,4 @@ notebooks/
 ^README\.Rmd$
 ^\.github$
 ^codecov\.yml$
+^CITATION\.cff$
