@@ -3,9 +3,9 @@
 #'
 #' Runs [bvstep()] a number of times with random starts, sorts the outcomes by
 #' correlation, and returns the best `num_best_results` as either a list or
-#' dataframe. This uses {furrr} if it is installed, and so allows the user to
-#' run each set of randon starts in parallel by setting a `[future::plan()]`,
-#' e.g. `plan(multisession)` before running this code.
+#' dataframe. This uses [furrr::future_map()] if it is installed, and so allows
+#' the user to run each set of randon starts in parallel by setting a
+#' [future::plan()], e.g. `plan(multisession)` before running this code.
 #'
 #'
 #' @inheritParams bvstep
@@ -30,7 +30,9 @@
 #'   'steps`
 #'  * `TRUE`: return a dataframe as in [bvstep()] with an additional column indicating which iterations are returned.
 #'  * `FALSE`: return a list, with each element a dataframe as returned by [bvstep()]
-#' @param parallel logical, default TRUE. Parallelise over num_restarts using [furrr::future_map()]. Need to have {furrr} installed and have set a [future::plan()]. See the help for {furrr} or {future}.
+#' @param parallel logical, default TRUE. Parallelise over num_restarts using
+#'   [furrr::future_map()]. Need to have `furrr` installed and have set a
+#'   [future::plan()]. See `?furrr::future_map()` or `?future::plan`.
 #'
 #' @return dataframe (typically) or list (if `return_type == 'steps'` and
 #'   `returndf = FALSE`), of the best `num_best_results`, sorted by number of

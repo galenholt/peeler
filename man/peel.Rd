@@ -69,7 +69,9 @@ boundary.}
 
 \item{corr_method}{character, default \code{kendall}. This is the \code{method} argument of \code{\link[=cor]{cor()}}. Clarke and Warwick 1998 suggests kendall because we need a rank correlation and spearman doesn't handle ties.}
 
-\item{parallel}{logical, default TRUE. Parallelise over num_restarts using \code{\link[furrr:future_map]{furrr::future_map()}}. Need to have {furrr} installed and have set a \code{\link[future:plan]{future::plan()}}. See the help for {furrr} or {future}.}
+\item{parallel}{logical, default TRUE. Parallelise over num_restarts using
+\code{\link[furrr:future_map]{furrr::future_map()}}. Need to have \code{furrr} installed and have set a
+\code{\link[future:plan]{future::plan()}}. See \code{?furrr::future_map()} or \code{?future::plan}.}
 }
 \value{
 a tibble

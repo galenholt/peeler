@@ -86,7 +86,9 @@ boundary.}
 
 \item{selection_ref}{character, \code{'name'} (default)- return the variable names in each step. \code{'index'} returns their column index in \code{comp_mat}}
 
-\item{parallel}{logical, default TRUE. Parallelise over num_restarts using \code{\link[furrr:future_map]{furrr::future_map()}}. Need to have {furrr} installed and have set a \code{\link[future:plan]{future::plan()}}. See the help for {furrr} or {future}.}
+\item{parallel}{logical, default TRUE. Parallelise over num_restarts using
+\code{\link[furrr:future_map]{furrr::future_map()}}. Need to have \code{furrr} installed and have set a
+\code{\link[future:plan]{future::plan()}}. See \code{?furrr::future_map()} or \code{?future::plan}.}
 }
 \value{
 dataframe (typically) or list (if \code{return_type == 'steps'} and
@@ -98,9 +100,9 @@ same num_vars and correlation
 \description{
 Runs \code{\link[=bvstep]{bvstep()}} a number of times with random starts, sorts the outcomes by
 correlation, and returns the best \code{num_best_results} as either a list or
-dataframe. This uses {furrr} if it is installed, and so allows the user to
-run each set of randon starts in parallel by setting a \verb{[future::plan()]},
-e.g. \code{plan(multisession)} before running this code.
+dataframe. This uses \code{\link[furrr:future_map]{furrr::future_map()}} if it is installed, and so allows
+the user to run each set of randon starts in parallel by setting a
+\code{\link[future:plan]{future::plan()}}, e.g. \code{plan(multisession)} before running this code.
 }
 \examples{
 require(vegan)
